@@ -1,0 +1,105 @@
+package live
+
+import (
+	"encoding/binary"
+	"encoding/json"
+	"log"
+	"time"
+)
+
+func (c *WsClient) routeOperation(header *Header, body []byte) {
+	switch header.Operation {
+	case OpHeartbeatReply:
+		if len(body) >= 4 {
+			popularity := binary.BigEndian.Uint32(body[:4])
+			c.EventCh <- Event{
+				Type:      PopularityEvent,
+				Data:      PopularityMsg{Popularity: int(popularity)},
+				Timestamp: time.Now().UnixNano(),
+			}
+		}
+
+	case OpSendMsgReply:
+		c.dispatch(body)
+
+	case OpAuthReply:
+		log.Printf("[Yuuna-Danmu] Auth success")
+
+	default:
+		log.Printf("[Yuuna-Danmu] Unknown operation: %d", header.Operation)
+	}
+}
+
+func (c *WsClient) dispatch(body []byte) {
+	var base BaseMsg
+	if err := json.Unmarshal(body, &base); err != nil {
+		return
+	}
+
+	switch base.Cmd {
+	case DanmuEvent:
+		data := c.parseDanmu(body)
+		c.EventCh <- Event{
+			Type:      DanmuEvent,
+			Data:      data,
+			Timestamp: time.Now().UnixNano(),
+		}
+	case GiftEvent:
+		data := c.parseGift(body)
+		c.EventCh <- Event{
+			Type:      GiftEvent,
+			Data:      data,
+			Timestamp: time.Now().UnixNano(),
+		}
+	case "INTERACT_WORD":
+	default:
+		log.Printf("[Yuuna-Danmu] Unknown cmd: %s", base.Cmd)
+	}
+}
+
+func (c *WsClient) parseDanmu(body []byte) *DanmuMsg {
+	var raw struct {
+		Info []interface{} `json:"info"`
+	}
+	if err := json.Unmarshal(body, &raw); err != nil {
+		return nil
+	}
+
+	if len(raw.Info) < 3 {
+		return nil
+	}
+
+	content, _ := raw.Info[1].(string)
+
+	userSlice, _ := raw.Info[2].([]interface{})
+	nickname, _ := userSlice[1].(string)
+
+	// 3. 提取勋章信息 (在 info[3])
+	// info[3] 结构: [等级, 名称, 主播名, 房间ID, ...]
+	var medalName string
+	var medalLevel int
+	if medalSlice, ok := raw.Info[3].([]interface{}); ok && len(medalSlice) > 0 {
+		medalLevel = int(medalSlice[0].(float64))
+		medalName, _ = medalSlice[1].(string)
+	}
+	danMu := &DanmuMsg{
+		Content:    content,
+		UserID:     int64(userSlice[0].(float64)),
+		Nickname:   nickname,
+		MedalName:  medalName,
+		MedalLevel: medalLevel,
+	}
+
+	return danMu
+}
+
+func (c *WsClient) parseGift(body []byte) *GiftData {
+	var raw struct {
+		Data GiftData `json:"data"`
+	}
+
+	if err := json.Unmarshal(body, &raw); err != nil {
+		return nil
+	}
+	return &raw.Data
+}
