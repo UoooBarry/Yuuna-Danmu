@@ -47,4 +47,6 @@ var (
 	DanmuEvent      = "DANMU_MSG"
 	PopularityEvent = "POPULARITY"
 	GiftEvent       = "SEND_GIFT"
+	SysMsgEvent     = "SYS_MSG"
+	ErrorEvent      = "SYS_ERROR"
 )

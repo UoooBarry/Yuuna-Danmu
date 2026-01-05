@@ -62,27 +62,37 @@ func (w *WailsUI) Start() error {
 }
 
 func (w *WailsUI) AppendDanmu(medalName string, medalLevel int, nickname, content string) {
-	if w.ctx != nil {
-		runtime.EventsEmit(w.ctx, live.DanmuEvent, map[string]string{
-			"nickname":   nickname,
-			"content":    content,
-			"medalName":  medalName,
-			"medalLevel": fmt.Sprintf("%d", medalLevel),
-			"timestamp":  time.Now().Format(time.TimeOnly),
-		})
+	if w.ctx == nil {
+		return
 	}
+
+	runtime.EventsEmit(w.ctx, live.DanmuEvent, map[string]string{
+		"nickname":   nickname,
+		"content":    content,
+		"medalName":  medalName,
+		"medalLevel": fmt.Sprintf("%d", medalLevel),
+		"timestamp":  time.Now().Format(time.TimeOnly),
+	})
 }
 
 func (t *WailsUI) AppendGift(nickname, giftName string, count int) {
 	fmt.Printf("[%s] [礼物] [%s] 送出 %s x %d\n", time.Now().Format(time.TimeOnly), nickname, giftName, count)
 }
 
-func (t *WailsUI) AppendError(err error) {
-	fmt.Printf("[%s] [错误] %v\n", time.Now().Format(time.TimeOnly), err)
+func (w *WailsUI) AppendError(err error) {
+	if w.ctx == nil {
+		return
+	}
+
+	runtime.EventsEmit(w.ctx, live.ErrorEvent, err.Error())
 }
 
-func (t *WailsUI) AppendSysMsg(msg string) {
-	fmt.Printf("[%s] [系统] %s\n", time.Now().Format(time.TimeOnly), msg)
+func (w *WailsUI) AppendSysMsg(msg string) {
+	if w.ctx == nil {
+		return
+	}
+
+	runtime.EventsEmit(w.ctx, live.SysMsgEvent, msg)
 }
 
 func (w *WailsUI) SaveConfig(cfg config.AppConfig) string {

@@ -93,13 +93,14 @@ func (app *App) RestartSession(newRoomID int, newCookie string) error {
 		app.session.Stop()
 	}
 	app.session.UpdateConfig(newRoomID, newCookie)
-	log.Printf("[Yuuna-Danmu] RoomID: %d, Cookie: %s", newRoomID, newCookie)
+	app.ui.AppendSysMsg("[Yuuna-Danmu]Session restarting...")
 	go func() {
 		if err := app.session.Start(); err != nil {
 			if apiErr, ok := err.(*errors.ApiError); ok {
 				app.ui.AppendError(apiErr)
 			}
 		}
+		app.ui.AppendSysMsg("[Yuuna-Danmu]Session restarted")
 	}()
 
 	return nil

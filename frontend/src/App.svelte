@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { EventsOn, Quit } from "../wailsjs/runtime/runtime";
+  import { EventsEmit, EventsOn, Quit } from "../wailsjs/runtime/runtime";
   import { onMount } from "svelte";
   import { SaveConfig, LoadConfig } from "../wailsjs/go/ui/WailsUI";
+  import ToastNotification from './lib/components/ToastNotification.svelte';
 
   let danmuList = [];
   let container: HTMLElement;
@@ -27,11 +28,20 @@
       if (danmuList.length > 100) danmuList = danmuList.slice(1);
       setTimeout(scrollToBottom, 50);
     });
+
+    EventsOn("SYS_MSG", (msg) => {
+      EventsEmit("SYS_MSG", msg)
+    });
+
+    EventsOn("SYS_ERROR", (msg) => {
+      EventsEmit("SYS_ERROR", msg)
+    });
   });
 
   async function handleSave() {
     const res = await SaveConfig({ room_id: Number(roomID), cookie: cookie });
     alert(res);
+    danmuList = [];
     showSettings = false;
   }
 </script>
@@ -112,30 +122,10 @@
   </div>
 </main>
 
+<ToastNotification />
+
 <style>
   /* Little bit of rose pine */
-  :root {
-    --base: #191724;
-    --surface: #1f1d2e;
-    --overlay: #26233a;
-    --muted: #6e6a86;
-    --subtle: #908caa;
-    --text: #e0def4;
-    --love: #eb6f92;
-    --gold: #f6c177;
-    --rose: #ebbcba;
-    --pine: #31748f;
-    --foam: #9ccfd8;
-    --iris: #c4a7e7;
-  }
-
-  :global(body) {
-    background-color: transparent !important;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-  }
-
   .app-container {
     height: 100%;
     background-color: rgba(25, 23, 36, 0.7); /* 半透明 --base */
