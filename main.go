@@ -12,13 +12,11 @@ import (
 )
 
 func main() {
-	roomID := 50819
 	wbi.EnsureBuvid()
-	app := app.NewApp(roomID,
-		app.WithUI(ui.NewTerminalUI()),
+	app := app.NewApp(
+		app.WithUI(ui.NewWailsUI(assets)),
 		app.WithFileLog("log/yuuna-danmu.log"),
 	)
-
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 	go func() {

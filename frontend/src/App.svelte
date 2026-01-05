@@ -1,0 +1,369 @@
+<script lang="ts">
+  import { EventsOn, Quit } from "../wailsjs/runtime/runtime";
+  import { onMount } from "svelte";
+  import { SaveConfig, LoadConfig } from "../wailsjs/go/ui/WailsUI";
+
+  let danmuList = [];
+  let container: HTMLElement;
+  let showControls = false;
+  let showSettings = false;
+  let roomID = 50819;
+  let cookie = "";
+
+  const scrollToBottom = () => {
+    if (container) {
+      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+    }
+  };
+
+  onMount(() => {
+    LoadConfig().then((config: { room_id: number; cookie: string }) => {
+      roomID = Number(config.room_id);
+      cookie = config.cookie;
+    })
+
+    EventsOn("DANMU_MSG", (data) => {
+      danmuList = [...danmuList, data];
+      if (danmuList.length > 100) danmuList = danmuList.slice(1);
+      setTimeout(scrollToBottom, 50);
+    });
+  });
+
+  async function handleSave() {
+    const res = await SaveConfig({ room_id: Number(roomID), cookie: cookie });
+    alert(res);
+    showSettings = false;
+  }
+</script>
+
+<main
+  class="app-container"
+  on:mouseenter={() => (showControls = true)}
+  on:mouseleave={() => (showControls = false)}
+>
+  <header class="drag-bar">
+    <span class="title">Yuuna Danmu</span>
+
+    <div class="controls" class:visible={showControls}>
+      <div class="controls" class:visible={showControls}>
+        <button
+          class="setting-btn"
+          on:click={() => (showSettings = !showSettings)}
+          title="设置"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path
+              fill="currentColor"
+              d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.35 19.43,11.03L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.97 19.05,5.05L16.56,6.05C16.04,5.65 15.44,5.32 14.8,5.07L14.42,2.42C14.38,2.19 14.17,2 13.93,2H9.93C9.68,2 9.48,2.19 9.44,2.42L9.06,5.07C8.42,5.32 7.82,5.65 7.3,6.05L4.81,5.05C4.59,4.97 4.32,5.05 4.2,5.27L2.2,8.73C2.08,8.95 2.13,9.22 2.32,9.37L4.43,11.03C4.39,11.35 4.36,11.67 4.36,12C4.36,12.33 4.39,12.65 4.43,12.97L2.32,14.63C2.13,14.78 2.08,15.05 2.2,15.27L4.2,18.73C4.32,18.95 4.59,19.03 4.81,18.95L7.3,17.95C7.82,18.35 8.42,18.68 9.06,18.93L9.44,21.58C9.48,21.81 9.68,22 9.93,22H13.93C14.17,22 14.38,21.81 14.42,21.58L14.8,18.93C15.44,18.68 16.04,18.35 16.56,17.95L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
+            />
+          </svg>
+        </button>
+        <button class="close-btn" on:click={Quit} title="关闭">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path
+              fill="currentColor"
+              d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="content-area">
+    {#if showSettings}
+      <div class="settings-panel">
+        <div class="field">
+          <label for="room-id">Room ID</label>
+          <input
+            type="number"
+            id="room-id"
+            bind:value={roomID}
+            placeholder="输入直播间号"
+          />
+        </div>
+        <div class="field">
+          <label for="cookie">Cookie (SESSDATA)</label>
+          <textarea
+            bind:value={cookie}
+            id="cookie"
+            placeholder="Cookie"
+            rows="5"
+          ></textarea>
+        </div>
+        <button class="save-btn" on:click={handleSave}>Apply & Restart</button>
+      </div>
+    {:else}
+      <div class="danmu-box" bind:this={container}>
+        {#each danmuList as d}
+          <div class="danmu-item">
+            {#if d.medalName}
+              <span class="medal-tag">
+                <span class="m-name">{d.medalName}</span>
+                <span class="m-level">{d.medalLevel}</span>
+              </span>
+            {/if}
+            <span class="nickname">{d.nickname}:</span>
+            <span class="content">{d.content}</span>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </div>
+</main>
+
+<style>
+  /* Little bit of rose pine */
+  :root {
+    --base: #191724;
+    --surface: #1f1d2e;
+    --overlay: #26233a;
+    --muted: #6e6a86;
+    --subtle: #908caa;
+    --text: #e0def4;
+    --love: #eb6f92;
+    --gold: #f6c177;
+    --rose: #ebbcba;
+    --pine: #31748f;
+    --foam: #9ccfd8;
+    --iris: #c4a7e7;
+  }
+
+  :global(body) {
+    background-color: transparent !important;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .app-container {
+    height: 100%;
+    background-color: rgba(25, 23, 36, 0.7); /* 半透明 --base */
+    backdrop-filter: blur(12px); /* 磨砂效果 */
+    border: 1px solid rgba(144, 140, 170, 0.2); /* 细微边框 */
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    color: var(--text);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .drag-bar {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    --wails-draggable: drag; /* 允许拖动整个窗口 */
+    border-bottom: 1px solid rgba(144, 140, 170, 0.1);
+  }
+
+  .danmu-box {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      black 5%,
+      black 95%,
+      transparent
+    );
+  }
+
+  .danmu-box::-webkit-scrollbar {
+    width: 4px;
+  }
+  .danmu-box::-webkit-scrollbar-thumb {
+    background: var(--overlay);
+    border-radius: 10px;
+  }
+
+  .danmu-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 8px;
+    text-align: left;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .medal-tag {
+    display: inline-flex;
+    flex-shrink: 0;
+    background: var(--overlay);
+    border: 1px solid rgba(110, 106, 134, 0.5); /* --muted with alpha */
+    border-radius: 4px;
+    margin-right: 8px;
+    height: 20px;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .m-name {
+    display: inline-block;
+    min-width: 32px;
+    text-align: center;
+    padding: 0 4px;
+    font-size: 11px;
+    color: var(--pine);
+    background-color: rgba(49, 116, 143, 0.1);
+  }
+  .m-level {
+    display: inline-block;
+    min-width: 18px;
+    text-align: center;
+    font-size: 10px;
+    color: var(--gold);
+    border-left: 1px solid rgba(110, 106, 134, 0.3);
+    padding: 0 3px;
+  }
+  .nickname {
+    color: var(--rose);
+    font-weight: 600;
+    white-space: nowrap;
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+  .content {
+    color: var(--text);
+    flex: 1;
+    text-align: left;
+    word-break: break-all;
+    white-space: pre-wrap;
+  }
+  .drag-bar {
+    position: relative;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+    --wails-draggable: drag;
+    background: rgba(31, 29, 46, 0.4);
+  }
+
+  .controls {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    --wails-draggable: none;
+    display: flex;
+    align-items: center;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+  }
+
+  .controls.visible {
+    opacity: 1;
+  }
+
+  .close-btn, .setting-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .setting-btn:hover {
+    background-color: var(--pine);
+    color: var(--base);
+  }
+
+  .close-btn:hover {
+    background-color: var(--love);
+    color: var(--base);
+  }
+
+  .title {
+    font-size: 10px;
+    font-weight: bold;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .settings-panel {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: var(--surface);
+    height: 100%;
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .field label {
+    font-size: 11px;
+    color: var(--iris);
+    text-transform: uppercase;
+  }
+
+  input,
+  textarea {
+    background: var(--overlay);
+    border: 1px solid var(--muted);
+    color: var(--text);
+    padding: 8px;
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+  }
+
+  input:focus,
+  textarea:focus {
+    border-color: var(--pine);
+  }
+
+  .save-btn {
+    background: var(--pine);
+    color: var(--base);
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: auto;
+  }
+
+  .save-btn:hover {
+    background: var(--foam);
+  }
+</style>

@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"time"
 
+	"uooobarry/yuuna-danmu/pkg/errors"
 	"uooobarry/yuuna-danmu/pkg/wbi"
 )
 
@@ -52,7 +53,7 @@ func GetRealRoomID(roomID int) (int, error) {
 	}
 
 	if result.Code != 0 {
-		return 0, fmt.Errorf("api error: %s (code: %d)", result.Message, result.Code)
+		return 0, &errors.ApiError{Code: result.Code, Message: result.Message, RawErr: err}
 	}
 
 	return result.Data.RoomID, nil
@@ -80,7 +81,7 @@ func GetDanmuConfig(roomID int) (*DanmuInfoResp, error) {
 	}
 
 	if result.Code != 0 {
-		return nil, fmt.Errorf("api error: %s (code: %d)", result.Message, result.Code)
+		return nil, &errors.ApiError{Code: result.Code, Message: result.Message, RawErr: err}
 	}
 	return &result, nil
 }

@@ -1,42 +1,16 @@
-# Yuuna Danmu
+# README
 
-这是一个用 Go 语言编写的轻量级 B 站直播弹幕监听工具。你可以用它来实时获取直播间的弹幕、礼物以及人气值等数据，方便后续开发直播助手、自动回复机器人或者数据统计工具。
-参考文档基本出自[哔哩哔哩 - API 收集整理](https://github.com/SocialSisterYi/bilibili-API-collect)
+## About
 
-### 核心功能
+This is the official Wails Svelte-TS template.
 
-* **实时弹幕读取**：秒级获取直播间观众发送的弹幕。
-* **礼物记录**：自动识别送礼行为（支持连击识别）。
-* **人气监控**：同步解析直播间的实时人气值。
-* **稳定可靠**：内置连接管理，支持优雅退出。
+## Live Development
 
-### 如何使用
+To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
+server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
+and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
+to this in your browser, and you can call your Go code from devtools.
 
-目前项目正在开发中，你可以通过以下方式简单上手：
+## Building
 
-1. **修改配置**：在 `main.go` 中填入你想要监听的直播间号。
-2. **启动程序**：
-```bash
-go run main.go
-
-```
-
-
-3. **获取数据**：程序会通过 `Channel` 将解析好的数据推送出来，你只需要在主循环中按需处理即可。
-
-### 消息演示
-
-运行成功后，你将在控制台看到类似下面的输出：
-
-```text
-2026/01/04 15:24:55 [Yuuna-Danmu] Connecting to room: 545068
-2026/01/04 15:24:55 [Yuuna-Danmu] Auth success
-[牌子|10] 路人: Hello
-
-```
-
-### 开发计划
-
-* [ ] 增加自动重连机制（防止网络波动导致断开）。
-* [ ] 完善更多消息类型（如：舰长开通、醒目留言 SC 等）。
-* [ ] 增加本地日志记录功能。
+To build a redistributable, production mode package, use `wails build`.

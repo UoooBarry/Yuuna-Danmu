@@ -6,4 +6,5 @@ type UI interface {
 	AppendError(err error)
 	AppendSysMsg(msg string)
 	Start() error
+	SetOnConfigChange(onConfigChange OnConfigChange)
 }
