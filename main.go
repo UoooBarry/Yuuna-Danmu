@@ -14,7 +14,7 @@ import (
 func main() {
 	wbi.EnsureBuvid()
 	app := app.NewApp(
-		app.WithUI(ui.NewWailsUI(assets)),
+		app.WithUI(ui.NewWailsUI(&assets)),
 		app.WithFileLog("log/yuuna-danmu.log"),
 	)
 	sigCh := make(chan os.Signal, 1)

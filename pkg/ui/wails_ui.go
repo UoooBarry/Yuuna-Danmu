@@ -18,16 +18,23 @@ import (
 
 type WailsUI struct {
 	ctx            context.Context
-	AssetFS        embed.FS
+	AssetFS        *embed.FS
 	onConfigChange OnConfigChange
+	emitter        func(ctx context.Context, name string, data ...any)
 }
 
 type OnConfigChange func(cfg config.AppConfig) error
 
-func NewWailsUI(assetFS embed.FS) *WailsUI {
-	return &WailsUI{
+func NewWailsUI(assetFS *embed.FS, opts ...func(*WailsUI)) *WailsUI {
+	ui := &WailsUI{
 		AssetFS: assetFS,
+		emitter: runtime.EventsEmit,
 	}
+	return ui
+}
+
+func (w *WailsUI) SetContext(ctx context.Context) {
+	w.ctx = ctx
 }
 
 func (w *WailsUI) OnStartup(ctx context.Context) {
@@ -66,7 +73,7 @@ func (w *WailsUI) AppendDanmu(medalName string, medalLevel int, nickname, conten
 		return
 	}
 
-	runtime.EventsEmit(w.ctx, live.DanmuEvent, map[string]string{
+	w.emitter(w.ctx, live.DanmuEvent, map[string]string{
 		"nickname":   nickname,
 		"content":    content,
 		"medalName":  medalName,
@@ -84,7 +91,7 @@ func (w *WailsUI) AppendError(err error) {
 		return
 	}
 
-	runtime.EventsEmit(w.ctx, live.ErrorEvent, err.Error())
+	w.emitter(w.ctx, live.ErrorEvent, err.Error())
 }
 
 func (w *WailsUI) AppendSysMsg(msg string) {
@@ -92,7 +99,7 @@ func (w *WailsUI) AppendSysMsg(msg string) {
 		return
 	}
 
-	runtime.EventsEmit(w.ctx, live.SysMsgEvent, msg)
+	w.emitter(w.ctx, live.SysMsgEvent, msg)
 }
 
 func (w *WailsUI) SaveConfig(cfg config.AppConfig) string {
