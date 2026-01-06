@@ -1,8 +1,10 @@
 package ui
 
+import "uooobarry/yuuna-danmu/pkg/live"
+
 type UI interface {
 	AppendDanmu(medalName string, medalLevel int, nickname, content string)
-	AppendGift(nickname, giftName string, count int)
+	AppendGift(gift *live.GiftData)
 	AppendError(err error)
 	AppendSysMsg(msg string)
 	Start() error

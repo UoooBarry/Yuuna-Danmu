@@ -1,8 +1,8 @@
 <script lang="ts">
   import { EventsEmit, EventsOn, Quit } from "../wailsjs/runtime/runtime";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { SaveConfig, LoadConfig } from "../wailsjs/go/ui/WailsUI";
-  import ToastNotification from './lib/components/ToastNotification.svelte';
+  import ToastNotification from "./lib/components/ToastNotification.svelte";
 
   let danmuList = [];
   let container: HTMLElement;
@@ -11,8 +11,9 @@
   let roomID = 50819;
   let cookie = "";
 
-  const scrollToBottom = () => {
+  const scrollToBottom = async () => {
     if (container) {
+      await tick();
       container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
     }
   };
@@ -21,28 +22,60 @@
     LoadConfig().then((config: { room_id: number; cookie: string }) => {
       roomID = Number(config.room_id);
       cookie = config.cookie;
-    })
+      EventsEmit("SYS_MSG", "loaded config");
+    });
 
     EventsOn("DANMU_MSG", (data) => {
-      danmuList = [...danmuList, data];
+      danmuList = [...danmuList, { ...data, type: "danmu" }];
       if (danmuList.length > 100) danmuList = danmuList.slice(1);
-      setTimeout(scrollToBottom, 50);
+      scrollToBottom();
     });
 
-    EventsOn("SYS_MSG", (msg) => {
-      EventsEmit("SYS_MSG", msg)
-    });
+    EventsOn("SEND_GIFT", (data) => {
+      const currentComboId = data.combo_send.combo_id;
 
-    EventsOn("SYS_ERROR", (msg) => {
-      EventsEmit("SYS_ERROR", msg)
+      const existingIndex = danmuList.findIndex(
+        (item) => item.type === "gift" && item.combo_id === currentComboId,
+      );
+
+      let updatedGift;
+
+      if (currentComboId && existingIndex !== -1) {
+        const oldGift = danmuList[existingIndex];
+
+        updatedGift = {
+          ...data,
+          type: "gift",
+          combo_id: currentComboId,
+          gift_num:
+            data.combo_send?.combo_num || data.gift_num || oldGift.gift_num,
+        };
+
+        danmuList.splice(existingIndex, 1);
+      } else {
+        updatedGift = {
+          ...data,
+          type: "gift",
+          combo_id: currentComboId,
+          gift_num: data.combo_send?.combo_num || data.gift_num || 1,
+        };
+      }
+
+      danmuList = [...danmuList, updatedGift];
+      if (danmuList.length > 100) danmuList = danmuList.slice(1);
+      scrollToBottom();
     });
   });
 
   async function handleSave() {
-    const res = await SaveConfig({ room_id: Number(roomID), cookie: cookie });
-    alert(res);
+    await SaveConfig({ room_id: Number(roomID), cookie: cookie });
     danmuList = [];
     showSettings = false;
+  }
+
+  function getProxyUrl(originalUrl: string) {
+    if (!originalUrl) return "";
+    return `/proxy?url=${encodeURIComponent(originalUrl)}`;
   }
 </script>
 
@@ -106,16 +139,61 @@
     {:else}
       <div class="danmu-box" bind:this={container}>
         {#each danmuList as d}
-          <div class="danmu-item">
-            {#if d.medalName}
-              <span class="medal-tag">
-                <span class="m-name">{d.medalName}</span>
-                <span class="m-level">{d.medalLevel}</span>
-              </span>
-            {/if}
-            <span class="nickname">{d.nickname}:</span>
-            <span class="content">{d.content}</span>
-          </div>
+          {#if d.type === "danmu"}
+            <div class="danmu-item">
+              {#if d.medalName}
+                <span class="medal-tag">
+                  <span class="m-name">{d.medalName}</span>
+                  <span class="m-level">{d.medalLevel}</span>
+                </span>
+              {/if}
+              <span class="nickname">{d.nickname}:</span>
+              <span class="content">{d.content}</span>
+            </div>
+          {:else if d.type === "gift"}
+            <div class="danmu-item gift-wrapper">
+              <div class="gift-header">
+                {#if d.face}
+                  <img
+                    src={getProxyUrl(d.face)}
+                    alt=""
+                    class="user-face-mini"
+                  />
+                {/if}
+                {#if d.medalName}
+                  <span class="medal-tag mini">
+                    <span class="m-name">{d.medalName}</span>
+                    <span class="m-level">{d.medalLevel}</span>
+                  </span>
+                {/if}
+                <span class="nickname">{d.uname}</span>
+                <span class="action">{d.action || "投喂"}</span>
+              </div>
+
+              <div class="gift-body">
+                {#if d.gift_info}
+                  <img
+                    src={getProxyUrl(d.gift_info.gif)}
+                    alt={d.gift_name}
+                    class="gift-img"
+                  />
+                {:else}
+                  <span class="gift-emoji">🎁</span>
+                {/if}
+
+                <div class="gift-details">
+                  <span class="gift-name">{d.gift_name}</span>
+                  <span class="gift-count">x {d.combo_send.combo_num}</span>
+                </div>
+
+                {#if d.coin_type === "gold"}
+                  <div class="coin-badge">
+                    ¥{(d.combo_total_coin / 1000).toFixed(1)}
+                  </div>
+                {/if}
+              </div>
+            </div>
+          {/if}
         {/each}
       </div>
     {/if}
@@ -128,17 +206,27 @@
   /* Little bit of rose pine */
   .app-container {
     height: 100%;
-    background-color: rgba(25, 23, 36, 0.7); /* 半透明 --base */
-    backdrop-filter: blur(12px); /* 磨砂效果 */
-    border: 1px solid rgba(144, 140, 170, 0.2); /* 细微边框 */
+    overflow: hidden;
+    background-color: rgba(25, 23, 36, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(144, 140, 170, 0.2);
     border-radius: 12px;
     display: flex;
     flex-direction: column;
     color: var(--text);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    scrollbar-width: none;
+  }
+
+  .content-area {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .drag-bar {
+    flex-shrink: 0;
     height: 30px;
     display: flex;
     align-items: center;
@@ -158,8 +246,8 @@
     mask-image: linear-gradient(
       to bottom,
       transparent,
-      black 5%,
-      black 95%,
+      black 1%,
+      black 99%,
       transparent
     );
   }
@@ -180,6 +268,7 @@
     width: 100%;
     margin-bottom: 8px;
     text-align: left;
+    word-break: break-all;
   }
 
   @keyframes fadeIn {
@@ -263,7 +352,8 @@
     opacity: 1;
   }
 
-  .close-btn, .setting-btn {
+  .close-btn,
+  .setting-btn {
     background: transparent;
     border: none;
     color: var(--muted);
@@ -355,5 +445,113 @@
 
   .save-btn:hover {
     background: var(--foam);
+  }
+
+  .gift-wrapper {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(
+      135deg,
+      rgba(235, 111, 146, 0.15) 0%,
+      rgba(25, 23, 36, 0.4) 100%
+    );
+    border-left: 3px solid var(--rose);
+    border-radius: 8px;
+    padding: 8px;
+    margin: 6px 0;
+    gap: 6px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: giftIn 0.4s ease-out forwards;
+  }
+
+  /* 第一行样式 */
+  .gift-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+  }
+
+  .user-face-mini {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid var(--rose);
+  }
+
+  .medal-tag.mini {
+    transform: scale(0.85);
+    margin-right: 0;
+  }
+
+  .action {
+    color: var(--muted);
+  }
+
+  .gift-body {
+    display: flex;
+    align-items: center;
+    width: 90%; /* 必须撑满宽度，badge 才能去到最右边 */
+    gap: 10px;
+    padding-top: 4px;
+  }
+
+  .gift-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(246, 193, 119, 0.5));
+  }
+
+  .gift-emoji {
+    font-size: 24px;
+  }
+
+  .gift-details {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .gift-name {
+    color: var(--gold);
+    font-weight: bold;
+    font-size: 13px;
+  }
+
+  .gift-count {
+    font-size: 16px;
+    font-style: italic;
+    text-shadow: 1px 1px 0 var(--base);
+    display: inline-block;
+    color: var(--rose);
+    font-weight: 900;
+    font-size: 1.4em;
+    text-shadow: 2px 2px 0 var(--base);
+    animation: comboPop 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+  }
+
+  @keyframes comboPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.6) rotate(-5deg); color: var(--gold); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  .coin-badge {
+    margin-left: auto;
+    flex-shrink: 0;
+
+    background: rgba(246, 193, 119, 0.1);
+    border: 1px solid rgba(246, 193, 119, 0.4);
+    color: var(--gold);
+
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    box-shadow: 0 0 8px rgba(246, 193, 119, 0.1);
   }
 </style>

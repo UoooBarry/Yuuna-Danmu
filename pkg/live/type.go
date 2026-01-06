@@ -27,16 +27,34 @@ type DanmuMsg struct {
 }
 
 type GiftData struct {
-	UID        int64  `json:"uid"`
-	Nickname   string `json:"uname"`
-	Action     string `json:"action"`
-	GiftName   string `json:"giftName"`
-	GiftID     int    `json:"giftId"`
-	Num        int    `json:"num"`
-	TotalCoin  int    `json:"total_coin"`
-	CoinType   string `json:"coin_type"`
-	ComboCount int    `json:"combo_count"`
-	Face       string `json:"face"`
+	UID            int64     `json:"uid"`
+	Uname          string    `json:"uname"`
+	Face           string    `json:"face"`
+	GiftName       string    `json:"gift_name"`
+	GiftNum        int       `json:"gift_num"`
+	Price          int       `json:"price"`
+	ComboTotalCoin int       `json:"combo_total_coin"`
+	TotalCoin      int       `json:"total_coin"`
+	CoinType       string    `json:"coin_type"`
+	Action         string    `json:"action"`
+	GiftInfo       GiftInfo  `json:"gift_info"`
+	MedalInfo      MedalInfo `json:"medal_info"`
+	ComboSend      ComboSend `json:"combo_send"`
+}
+
+type GiftInfo struct {
+	ImgBasic string `json:"img_basic"`
+	Gif      string `json:"gif"`
+}
+
+type MedalInfo struct {
+	MedalName  string `json:"medal_name"`
+	MedalLevel int    `json:"medal_level"`
+}
+
+type ComboSend struct {
+	ComboID  string `json:"combo_id"`
+	ComboNum int    `json:"combo_num"`
 }
 
 type PopularityMsg struct {

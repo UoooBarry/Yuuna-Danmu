@@ -9,7 +9,10 @@ import (
 type AppConfig struct {
 	RoomID int    `json:"room_id"`
 	Cookie string `json:"cookie"`
+	Debug  bool   `json:"debug"`
 }
+
+var defaultConfig = &AppConfig{RoomID: 23990839, Cookie: "", Debug: false}
 
 func GetConfigPath() string {
 	userConfigDir, _ := os.UserConfigDir()
@@ -23,12 +26,12 @@ func Load() *AppConfig {
 	path := GetConfigPath()
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return &AppConfig{RoomID: 23990839, Cookie: ""}
+		return defaultConfig
 	}
 
 	var cfg AppConfig
 	if err := json.Unmarshal(data, &cfg); err != nil {
-		return &AppConfig{RoomID: 23990839, Cookie: ""}
+		return defaultConfig
 	}
 	return &cfg
 }

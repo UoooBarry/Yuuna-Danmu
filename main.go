@@ -9,12 +9,17 @@ import (
 	"uooobarry/yuuna-danmu/pkg/app"
 	"uooobarry/yuuna-danmu/pkg/ui"
 	"uooobarry/yuuna-danmu/pkg/wbi"
+
+	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
 func main() {
 	wbi.EnsureBuvid()
 	app := app.NewApp(
-		app.WithUI(ui.NewWailsUI(&assets)),
+		app.WithUI(ui.NewWailsUI(&assetserver.Options{
+			Assets:     assets,
+			Middleware: proxyHandler,
+		})),
 		app.WithFileLog("log/yuuna-danmu.log"),
 	)
 	sigCh := make(chan os.Signal, 1)

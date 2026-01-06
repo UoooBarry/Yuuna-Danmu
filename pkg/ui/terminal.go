@@ -3,8 +3,6 @@ package ui
 import (
 	"fmt"
 	"time"
-
-	"uooobarry/yuuna-danmu/pkg/config"
 )
 
 type TerminalUI struct {
@@ -36,9 +34,9 @@ func (t *TerminalUI) AppendSysMsg(msg string) {
 	fmt.Printf("[%s] [系统] %s\n", time.Now().Format(time.TimeOnly), msg)
 }
 
-func (t *TerminalUI) SaveConfig(cfg config.AppConfig) string {
+func (t *TerminalUI) SaveConfig(roomID int, cookie string) string {
 	if t.onConfigChange != nil {
-		err := t.onConfigChange(cfg)
+		err := t.onConfigChange(roomID, cookie)
 		if err != nil {
 			return "更新失败: " + err.Error()
 		}

@@ -2,7 +2,6 @@ package ui
 
 import (
 	"context"
-	"embed"
 	"fmt"
 	"time"
 
@@ -18,17 +17,17 @@ import (
 
 type WailsUI struct {
 	ctx            context.Context
-	AssetFS        *embed.FS
 	onConfigChange OnConfigChange
 	emitter        func(ctx context.Context, name string, data ...any)
+	assetOpts      *assetserver.Options
 }
 
-type OnConfigChange func(cfg config.AppConfig) error
+type OnConfigChange func(roomID int, cookie string) error
 
-func NewWailsUI(assetFS *embed.FS, opts ...func(*WailsUI)) *WailsUI {
+func NewWailsUI(assetOts *assetserver.Options, opts ...func(*WailsUI)) *WailsUI {
 	ui := &WailsUI{
-		AssetFS: assetFS,
-		emitter: runtime.EventsEmit,
+		assetOpts: assetOts,
+		emitter:   runtime.EventsEmit,
 	}
 	return ui
 }
@@ -53,9 +52,7 @@ func (w *WailsUI) Start() error {
 		Frameless:        true,
 		AlwaysOnTop:      true,
 		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0},
-		AssetServer: &assetserver.Options{
-			Assets: w.AssetFS,
-		},
+		AssetServer:      w.assetOpts,
 		Windows: &windows.Options{
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
@@ -82,8 +79,8 @@ func (w *WailsUI) AppendDanmu(medalName string, medalLevel int, nickname, conten
 	})
 }
 
-func (t *WailsUI) AppendGift(nickname, giftName string, count int) {
-	fmt.Printf("[%s] [礼物] [%s] 送出 %s x %d\n", time.Now().Format(time.TimeOnly), nickname, giftName, count)
+func (w *WailsUI) AppendGift(gift *live.GiftData) {
+	w.emitter(w.ctx, live.GiftEvent, gift)
 }
 
 func (w *WailsUI) AppendError(err error) {
@@ -102,14 +99,19 @@ func (w *WailsUI) AppendSysMsg(msg string) {
 	w.emitter(w.ctx, live.SysMsgEvent, msg)
 }
 
-func (w *WailsUI) SaveConfig(cfg config.AppConfig) string {
+type configPayload struct {
+	RoomID int    `json:"room_id"`
+	Cookie string `json:"cookie"`
+}
+
+func (w *WailsUI) SaveConfig(payload configPayload) {
 	if w.onConfigChange != nil {
-		err := w.onConfigChange(cfg)
+		err := w.onConfigChange(payload.RoomID, payload.Cookie)
 		if err != nil {
-			return "更新失败: " + err.Error()
+			w.AppendError(err)
 		}
 	}
-	return "保存成功"
+	w.AppendSysMsg("保存成功")
 }
 
 func (w *WailsUI) LoadConfig() *config.AppConfig {
