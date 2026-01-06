@@ -23,20 +23,22 @@ type WsClient struct {
 	Token   string
 	EventCh chan Event
 	Cookie  string
+	WssPort int
 }
 
-func NewClient(session *Session, host string, token string) *WsClient {
+func NewClient(session *Session, host string, wssPort int, token string) *WsClient {
 	return &WsClient{
 		RoomID:  session.RoomID,
 		Host:    host,
 		Token:   token,
 		EventCh: session.EventCh,
+		WssPort: wssPort,
 		Cookie:  session.Cookie,
 	}
 }
 
 func (c *WsClient) Run(ctx context.Context) error {
-	address := fmt.Sprintf("wss://%s/sub", c.Host)
+	address := fmt.Sprintf("wss://%s:%d/sub", c.Host, c.WssPort)
 	header := http.Header{}
 	header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 	if c.Cookie != "" {

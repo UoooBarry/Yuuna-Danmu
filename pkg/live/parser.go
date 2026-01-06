@@ -23,7 +23,11 @@ func (c *WsClient) routeOperation(header *Header, body []byte) {
 		c.dispatch(body)
 
 	case OpAuthReply:
-		log.Printf("[Yuuna-Danmu] Auth success")
+		c.EventCh <- Event{
+			Type:      SysMsgEvent,
+			Data:      "连接上了...",
+			Timestamp: time.Now().UnixNano(),
+		}
 
 	default:
 		log.Printf("[Yuuna-Danmu] Unknown operation: %d", header.Operation)

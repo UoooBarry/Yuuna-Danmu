@@ -38,7 +38,7 @@
         (item) => item.type === "gift" && item.combo_id === currentComboId,
       );
 
-      let updatedGift;
+      let updatedGift: any;
 
       if (currentComboId && existingIndex !== -1) {
         const oldGift = danmuList[existingIndex];

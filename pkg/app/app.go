@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"log"
 	"os"
 	"time"
@@ -65,6 +66,14 @@ func (app *App) Run() error {
 				if g, ok := event.Data.(*live.GiftData); ok {
 					app.ui.AppendGift(g)
 				}
+			case live.ErrorEvent:
+				if g, ok := event.Data.(string); ok {
+					app.ui.AppendError(errors.New(g))
+				}
+			case live.SysMsgEvent:
+				if g, ok := event.Data.(string); ok {
+					app.ui.AppendSysMsg(g)
+				}
 			}
 		}
 	}()
@@ -97,7 +106,7 @@ func (app *App) RestartSession(newRoomID int, newCookie string) error {
 
 func (app *App) runSession() {
 	if app.AppConfig.Debug {
-		// app.ui.AppendSysMsg("[Debug Mode] Starting mock driver...")
+		app.ui.AppendSysMsg("[Debug Mode] Starting mock driver...")
 		app.startMockDriver()
 	} else {
 		if err := app.session.Start(); err != nil {

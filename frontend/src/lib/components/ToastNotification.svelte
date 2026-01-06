@@ -72,6 +72,7 @@
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.3px;
+    padding: 0 4px;
   }
 
   .info { border-bottom: 1px solid #9ccfd8; }

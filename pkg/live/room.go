@@ -28,14 +28,16 @@ type DanmuInfoResp struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 	Data    struct {
-		Token    string `json:"token"`
-		HostList []struct {
-			Host    string `json:"host"`
-			Port    int    `json:"port"`
-			WssPort int    `json:"wss_port"`
-			WsPort  int    `json:"ws_port"`
-		} `json:"host_list"`
+		Token    string     `json:"token"`
+		HostList []HostInfo `json:"host_list"`
 	} `json:"data"`
+}
+
+type HostInfo struct {
+	Host    string `json:"host"`
+	Port    int    `json:"port"`
+	WssPort int    `json:"wss_port"`
+	WsPort  int    `json:"ws_port"`
 }
 
 func GetRealRoomID(roomID int) (int, error) {

@@ -2,8 +2,10 @@ package live
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sync"
+	"time"
 )
 
 type Session struct {
@@ -54,7 +56,7 @@ func (session *Session) Start() error {
 	}
 
 	session.wg.Add(1)
-	go session.connectLoop(config.Data.HostList[0].Host, config.Data.Token)
+	go session.connectLoop(config.Data.HostList, config.Data.Token)
 
 	return nil
 }
@@ -69,24 +71,59 @@ func (session *Session) Stop() {
 	session.wg.Wait()
 }
 
-func (session *Session) connectLoop(host string, token string) {
+func (session *Session) connectLoop(hosts []HostInfo, token string) {
 	defer session.wg.Done()
 
-	for {
-		select {
-		case <-session.ctx.Done():
-			log.Printf("[Yuuna-Danmu] Session stopped by done")
-			return
-		default:
-			c := NewClient(session, host, token)
+	for i, hostInfo := range hosts {
+		host := hostInfo.Host
 
-			if err := c.Run(session.ctx); err != nil {
+		for {
+			select {
+			case <-session.ctx.Done():
+				log.Printf("[Yuuna-Danmu] Session stopped by context")
+				return
+			default:
+				session.sendSysMsg(fmt.Sprintf("[Yuuna-Danmu] Connecting to host [%d/%d]: %s:%d", i+1, len(hosts), host, hostInfo.WssPort))
+				c := NewClient(session, host, hostInfo.WssPort, token)
+
+				err := c.Run(session.ctx)
+
 				if session.ctx.Err() != nil {
+					log.Println("[Yuuna-Danmu] Context cancelled, exiting loop")
 					log.Println(session.ctx.Err())
 					return
 				}
-				log.Printf("[Yuuna-Danmu] Disconnecting: %v", err)
+
+				if err != nil {
+					session.sendErrorEvent(fmt.Sprintf("[Yuuna-Danmu] Disconnecting from %s:%d: %v", host, hostInfo.WssPort, err))
+
+					session.sendSysMsg("[Yuuna-Danmu] Attempting to switch to next host...")
+					goto nextHost
+				}
 			}
 		}
+	nextHost:
+		time.Sleep(3 * time.Second)
+	}
+
+	session.sendErrorEvent("[Yuuna-Danmu] All hosts tried. Stopping session.")
+	go session.Stop()
+}
+
+func (session *Session) sendSysMsg(msg string) {
+	log.Println(msg)
+	session.EventCh <- Event{
+		Type:      SysMsgEvent,
+		Data:      msg,
+		Timestamp: time.Now().Unix(),
+	}
+}
+
+func (session *Session) sendErrorEvent(errStr string) {
+	log.Println(errStr)
+	session.EventCh <- Event{
+		Type:      ErrorEvent,
+		Data:      errStr,
+		Timestamp: time.Now().Unix(),
 	}
 }
