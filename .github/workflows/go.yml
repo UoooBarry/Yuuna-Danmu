@@ -43,6 +43,8 @@ jobs:
 
     - name: Build frontend
       run: |
+        mkdir -p frontend/dist
+        touch frontend/dist/placeholder.txt
         wails generate module
         cd frontend
         npm ci
