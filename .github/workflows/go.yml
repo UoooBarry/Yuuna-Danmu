@@ -21,6 +21,9 @@ jobs:
       with:
         go-version: '1.25.5'
 
+    - name: Install wails cli
+      run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
@@ -32,6 +35,7 @@ jobs:
       run: |
         cd frontend
         npm ci
+        wails generate module
         npm run build
 
     - name: Test
