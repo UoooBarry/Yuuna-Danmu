@@ -25,11 +25,11 @@ jobs:
         go-version: '1.25.5'
 
     - name: Cache Wails CLI
-        id: cache-wails
-        uses: actions/cache@v4
-        with:
-          path: ~/go/bin/wails
-          key: ${{ runner.os }}-wails-${{ env.WAILS_VERSION }}
+      id: cache-wails
+      uses: actions/cache@v4
+      with:
+        path: ~/go/bin/wails
+        key: ${{ runner.os }}-wails-${{ env.WAILS_VERSION }}
 
     - name: Install wails cli
       run: go install github.com/wailsapp/wails/v2/cmd/wails@${{ env.WAILS_VERSION }}
