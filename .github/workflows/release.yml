@@ -23,7 +23,9 @@ jobs:
           - os: windows-latest
             platform: windows
           - os: macos-latest
-            platform: darwin
+            platform: darwin/amd64  # Intel Mac
+          - os: macos-latest
+            platform: darwin/arm64  # Apple Silicon Mac
 
     runs-on: ${{ matrix.os }}
 
@@ -52,8 +54,6 @@ jobs:
 
     - name: Build Wails App
       run: |
-        # Ensure path includes go/bin for wails command
-        export PATH=$PATH:$(go env GOPATH)/bin
         wails build -platform ${{ matrix.platform }}
 
     - name: Upload Artifacts
