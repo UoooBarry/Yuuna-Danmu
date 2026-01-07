@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows: ["Go"] # This must match the 'name:' defined in your go.yml
+    types:
+      - completed
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_commit.message, 'release:')
+    
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: windows
+          - os: macos-latest
+            platform: darwin
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.25'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'lts/*'
+
+    - name: Install Linux Dependencies
+      if: matrix.platform == 'linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev build-essential pkg-config
+
+    - name: Install Wails CLI
+      run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.9.2
+
+    - name: Build Wails App
+      run: |
+        # Ensure path includes go/bin for wails command
+        export PATH=$PATH:$(go env GOPATH)/bin
+        wails build -platform ${{ matrix.platform }}
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: wails-build-${{ matrix.platform }}
+        path: |
+          build/bin/*
+          !build/bin/*.txt
