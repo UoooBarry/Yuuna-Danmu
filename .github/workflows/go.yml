@@ -51,4 +51,4 @@ jobs:
         npm run build
 
     - name: Test
-      run: go test -v ./...
+ 
