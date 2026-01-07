@@ -22,10 +22,13 @@ jobs:
         include:
           - os: windows-latest
             platform: windows
+            artifact_name: windows
           - os: macos-latest
-            platform: darwin/amd64  # Intel Mac
+            platform: darwin/amd64
+            artifact_name: mac-intel
           - os: macos-latest
-            platform: darwin/arm64  # Apple Silicon Mac
+            platform: darwin/arm64
+            artifact_name: mac-sillicon
 
     runs-on: ${{ matrix.os }}
 
@@ -59,7 +62,7 @@ jobs:
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: release-${{ replace(matrix.platform, '/', '-') }}
+        name: release-${{ matrix.artifact_name }}
         path: |
           build/bin/*
           !build/bin/*.txt
