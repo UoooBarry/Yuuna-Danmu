@@ -55,6 +55,13 @@ func (c *WsClient) dispatch(body []byte) {
 			Data:      data,
 			Timestamp: time.Now().UnixNano(),
 		}
+	case SuperChatEvent:
+		data := c.parseSuperChat(body)
+		c.eventCh <- Event{
+			Type:      SuperChatEvent,
+			Data:      data,
+			Timestamp: time.Now().UnixNano(),
+		}
 	case "INTERACT_WORD":
 	default:
 	}
@@ -77,8 +84,6 @@ func (c *WsClient) parseDanmu(body []byte) *DanmuMsg {
 	userSlice, _ := raw.Info[2].([]interface{})
 	nickname, _ := userSlice[1].(string)
 
-	// 3. 提取勋章信息 (在 info[3])
-	// info[3] 结构: [等级, 名称, 主播名, 房间ID, ...]
 	var medalName string
 	var medalLevel int
 	if medalSlice, ok := raw.Info[3].([]interface{}); ok && len(medalSlice) > 0 {
@@ -101,6 +106,16 @@ func (c *WsClient) parseGift(body []byte) *GiftData {
 		Data GiftData `json:"data"`
 	}
 
+	if err := json.Unmarshal(body, &raw); err != nil {
+		return nil
+	}
+	return &raw.Data
+}
+
+func (c *WsClient) parseSuperChat(body []byte) *SuperChatMsgData {
+	var raw struct {
+		Data SuperChatMsgData `json:"data"`
+	}
 	if err := json.Unmarshal(body, &raw); err != nil {
 		return nil
 	}

@@ -3,8 +3,10 @@
   import { onMount, tick } from "svelte";
   import { SaveConfig, LoadConfig } from "../wailsjs/go/ui/WailsUI";
   import ToastNotification from "./lib/components/ToastNotification.svelte";
+  import SuperChatCard from "./lib/components/SuperChatCard.svelte";
 
   let danmuList = [];
+  let scList = [];
   let container: HTMLElement;
   let showControls = false;
   let showSettings = false;
@@ -65,7 +67,15 @@
       if (danmuList.length > 100) danmuList = danmuList.slice(1);
       scrollToBottom();
     });
+
+    EventsOn("SUPER_CHAT_MESSAGE", (data) => {
+      scList = [...scList, data];
+    });
   });
+
+  function handleScFinished(startTime: number) {
+    scList = scList.filter(s => s.start_time !== startTime);
+  }
 
   async function handleSave() {
     await SaveConfig({ room_id: Number(roomID), cookie: cookie });
@@ -137,6 +147,17 @@
         <button class="save-btn" on:click={handleSave}>Apply & Restart</button>
       </div>
     {:else}
+      {#if scList.length > 0}
+        <div class="pinned-sc-area">
+          {#each scList as sc (sc.start_time)}
+            <SuperChatCard 
+              data={sc} 
+              {getProxyUrl} 
+              onFinished={handleScFinished} 
+            />
+          {/each}
+        </div>
+      {/if}
       <div class="danmu-box" bind:this={container}>
         {#each danmuList as d}
           {#if d.type === "danmu"}
@@ -256,7 +277,6 @@
     width: 4px;
   }
   .danmu-box::-webkit-scrollbar-thumb {
-    background: var(--overlay);
     border-radius: 10px;
   }
 
@@ -553,5 +573,24 @@
     gap: 4px;
 
     box-shadow: 0 0 8px rgba(246, 193, 119, 0.1);
+  }
+
+  .pinned-sc-area {
+    display: flex;
+    flex-direction: row; 
+    gap: 12px;           
+    padding: 12px;
+    overflow-x: auto;    
+    overflow-y: hidden;
+    min-height: 110px;
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+  }
+
+  .pinned-sc-area::-webkit-scrollbar {
+    display: none;
   }
 </style>

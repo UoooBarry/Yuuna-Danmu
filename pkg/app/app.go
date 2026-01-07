@@ -3,6 +3,7 @@ package app
 import (
 	"errors"
 	"log"
+	"math/rand"
 	"os"
 	"time"
 
@@ -80,6 +81,10 @@ func (app *App) Run() error {
 				if g, ok := event.Data.(string); ok {
 					app.ui.AppendSysMsg(g)
 				}
+			case live.SuperChatEvent:
+				if g, ok := event.Data.(*live.SuperChatMsgData); ok {
+					app.ui.AppendSuperChat(g)
+				}
 			}
 		}
 	}()
@@ -133,6 +138,13 @@ func (app *App) startMockDriver() {
 	giftTicker := time.NewTicker(5 * time.Second)
 	defer giftTicker.Stop()
 
+	superChatTicker := time.NewTicker(30 * time.Second)
+	defer superChatTicker.Stop()
+
+	mockModel := &live.MedalInfo{
+		MedalName:  "开发者",
+		MedalLevel: 20,
+	}
 	for {
 		select {
 		case <-danmuTicker.C:
@@ -164,10 +176,7 @@ func (app *App) startMockDriver() {
 					ImgBasic: "https://i0.hdslb.com/bfs/live/816f8b7aa2132888fce928cdfb17b9cf21cc0823.gif",
 					Gif:      "https://s1.hdslb.com/bfs/live/e051dfd4557678f8edcac4993ed00a0935cbd9cc.png",
 				},
-				MedalInfo: live.MedalInfo{
-					MedalName:  "开发者",
-					MedalLevel: 20,
-				},
+				MedalInfo: *mockModel,
 				ComboSend: live.ComboSend{
 					ComboID:  "gift:combo_id:33313931353735d41d8cd98f00b204e9800998ecf8427e:1593304774:34001:1767675372.9443",
 					ComboNum: 1,
@@ -176,6 +185,23 @@ func (app *App) startMockDriver() {
 			app.session.EventCh <- live.Event{
 				Type: live.GiftEvent,
 				Data: mockGift,
+			}
+		case <-superChatTicker.C:
+			mockSuperChat := &live.SuperChatMsgData{
+				MedalInfo: *mockModel,
+				Message:   "这是一条模拟超级留言 " + time.Now().Format(time.TimeOnly),
+				FontColor: "#FF0000",
+				Price:     rand.Intn(100),
+				UserInfo: live.UserInfo{
+					UName: "花花花花人",
+					Face:  "http://i1.hdslb.com/bfs/face/8b9a772ff6414bf9a83b57f6fcc22b00821aeb03.jpg",
+				},
+				StartTime: time.Now().Unix(),
+				EndTime:   time.Now().Add(time.Minute).Unix(),
+			}
+			app.session.EventCh <- live.Event{
+				Type: live.SuperChatEvent,
+				Data: mockSuperChat,
 			}
 		}
 	}

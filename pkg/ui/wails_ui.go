@@ -3,6 +3,7 @@ package ui
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"uooobarry/yuuna-danmu/pkg/config"
@@ -80,7 +81,20 @@ func (w *WailsUI) AppendDanmu(medalName string, medalLevel int, nickname, conten
 }
 
 func (w *WailsUI) AppendGift(gift *live.GiftData) {
+	if w.ctx == nil {
+		return
+	}
+
 	w.emitter(w.ctx, live.GiftEvent, gift)
+}
+
+func (w *WailsUI) AppendSuperChat(superchat *live.SuperChatMsgData) {
+	if w.ctx == nil {
+		return
+	}
+
+	log.Println(superchat)
+	w.emitter(w.ctx, live.SuperChatEvent, superchat)
 }
 
 func (w *WailsUI) AppendError(err error) {

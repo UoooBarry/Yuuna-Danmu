@@ -32,7 +32,7 @@ type GiftData struct {
 	Face           string    `json:"face"`
 	GiftName       string    `json:"gift_name"`
 	GiftNum        int       `json:"gift_num"`
-	Price          int       `json:"price"`
+	Price          float64   `json:"price"`
 	ComboTotalCoin int       `json:"combo_total_coin"`
 	TotalCoin      int       `json:"total_coin"`
 	CoinType       string    `json:"coin_type"`
@@ -61,10 +61,26 @@ type PopularityMsg struct {
 	Popularity int
 }
 
+type SuperChatMsgData struct {
+	MedalInfo MedalInfo `json:"medal_info"`
+	Message   string    `json:"message"`
+	FontColor string    `json:"message_font_color"`
+	Price     int       `json:"price"`
+	UserInfo  UserInfo  `json:"user_info"`
+	StartTime int64     `json:"start_time"`
+	EndTime   int64     `json:"end_time"`
+}
+
+type UserInfo struct {
+	Face  string `json:"face"`
+	UName string `json:"uname"`
+}
+
 var (
 	DanmuEvent      = "DANMU_MSG"
 	PopularityEvent = "POPULARITY"
 	GiftEvent       = "SEND_GIFT"
 	SysMsgEvent     = "SYS_MSG"
 	ErrorEvent      = "SYS_ERROR"
+	SuperChatEvent  = "SUPER_CHAT_MESSAGE"
 )
