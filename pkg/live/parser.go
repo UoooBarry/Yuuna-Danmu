@@ -12,7 +12,7 @@ func (c *WsClient) routeOperation(header *Header, body []byte) {
 	case OpHeartbeatReply:
 		if len(body) >= 4 {
 			popularity := binary.BigEndian.Uint32(body[:4])
-			c.EventCh <- Event{
+			c.eventCh <- Event{
 				Type:      PopularityEvent,
 				Data:      PopularityMsg{Popularity: int(popularity)},
 				Timestamp: time.Now().UnixNano(),
@@ -23,7 +23,7 @@ func (c *WsClient) routeOperation(header *Header, body []byte) {
 		c.dispatch(body)
 
 	case OpAuthReply:
-		c.EventCh <- Event{
+		c.eventCh <- Event{
 			Type:      SysMsgEvent,
 			Data:      "连接上了...",
 			Timestamp: time.Now().UnixNano(),
@@ -43,21 +43,20 @@ func (c *WsClient) dispatch(body []byte) {
 	switch base.Cmd {
 	case DanmuEvent:
 		data := c.parseDanmu(body)
-		c.EventCh <- Event{
+		c.eventCh <- Event{
 			Type:      DanmuEvent,
 			Data:      data,
 			Timestamp: time.Now().UnixNano(),
 		}
 	case GiftEvent:
 		data := c.parseGift(body)
-		c.EventCh <- Event{
+		c.eventCh <- Event{
 			Type:      GiftEvent,
 			Data:      data,
 			Timestamp: time.Now().UnixNano(),
 		}
 	case "INTERACT_WORD":
 	default:
-		log.Printf("[Yuuna-Danmu] Unknown cmd: %s", base.Cmd)
 	}
 }
 

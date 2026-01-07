@@ -1,4 +1,4 @@
-package wbi
+package bilibili
 
 import (
 	"bytes"

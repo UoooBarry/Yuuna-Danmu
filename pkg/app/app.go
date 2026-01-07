@@ -40,18 +40,24 @@ func WithFileLog(filename string) Option {
 	}
 }
 
-func NewApp(opts ...Option) *App {
+func NewApp(opts ...Option) (*App, error) {
 	cfg := config.Load()
+
+	session, err := live.NewSession(cfg.RoomID, cfg.Cookie)
+	if err != nil {
+		return nil, err
+	}
+
 	app := &App{
 		AppConfig: *cfg,
-		session:   live.NewSession(cfg.RoomID, cfg.Cookie),
+		session:   session,
 	}
 
 	for _, opt := range opts {
 		opt(app)
 	}
 
-	return app
+	return app, nil
 }
 
 func (app *App) Run() error {

@@ -10,42 +10,47 @@ import (
 	"net/http"
 	"time"
 
-	"uooobarry/yuuna-danmu/pkg/wbi"
-
 	"github.com/andybalholm/brotli"
 	"github.com/gorilla/websocket"
 )
 
 type WsClient struct {
-	Conn    *websocket.Conn
-	RoomID  int
-	Host    string
-	Token   string
-	EventCh chan Event
-	Cookie  string
-	WssPort int
+	Conn        *websocket.Conn
+	RoomID      int
+	Host        string
+	Token       string
+	WssPort     int
+	authContext *AuthContext
+	eventCh     chan Event
 }
 
-func NewClient(session *Session, host string, wssPort int, token string) *WsClient {
+func init() {
+	websocket.DefaultDialer.HandshakeTimeout = 10 * time.Second
+}
+
+func (s *Session) NewClient(host string, wssPort int, token string) *WsClient {
 	return &WsClient{
-		RoomID:  session.RoomID,
-		Host:    host,
-		Token:   token,
-		EventCh: session.EventCh,
-		WssPort: wssPort,
-		Cookie:  session.Cookie,
+		RoomID:      s.RealRoomID,
+		Host:        host,
+		Token:       token,
+		WssPort:     wssPort,
+		authContext: s.authContext,
+		eventCh:     s.EventCh,
 	}
+}
+
+func (c *WsClient) getHeader() *http.Header {
+	header := http.Header{}
+	header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	if c.authContext.Cookie != "" {
+		header.Set("Cookie", c.authContext.Cookie)
+	}
+	return &header
 }
 
 func (c *WsClient) Run(ctx context.Context) error {
 	address := fmt.Sprintf("wss://%s:%d/sub", c.Host, c.WssPort)
-	header := http.Header{}
-	header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-	if c.Cookie != "" {
-		header.Set("Cookie", c.Cookie)
-	}
-
-	conn, _, err := websocket.DefaultDialer.DialContext(ctx, address, header)
+	conn, _, err := websocket.DefaultDialer.DialContext(ctx, address, *c.getHeader())
 	if err != nil {
 		return fmt.Errorf("[Yuuna-Danmu]dial error: %w", err)
 	}
@@ -64,18 +69,17 @@ func (c *WsClient) Run(ctx context.Context) error {
 }
 
 func (c *WsClient) sendAuth() error {
-	buvid, err := wbi.GetBuvid3()
-	if err != nil {
-		return err
-	}
+	buvid := c.authContext.Buvid3
+
 	payload := AuthPayload{
-		UID:      0,
+		UID:      c.authContext.UID,
 		RoomID:   c.RoomID,
 		ProtoVer: 3, // compress level 3
 		Type:     2,
 		Key:      c.Token,
 		Buvid:    buvid,
 	}
+	log.Println(payload)
 
 	body, _ := json.Marshal(payload)
 	return c.Conn.WriteMessage(websocket.BinaryMessage, Pack(OpAuth, body))

@@ -2,12 +2,11 @@ package live
 
 import (
 	"testing"
-
-	"uooobarry/yuuna-danmu/pkg/wbi"
 )
 
 func init() {
-	_ = wbi.EnsureBuvid()
+	session := &Session{}
+	session.prepareAuth("")
 }
 
 func TestGetRealRoomID(t *testing.T) {
@@ -23,9 +22,8 @@ func TestGetDanmuConfig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetRealRoomID failed: %v", err)
 	}
-	rsp, err := GetDanmuConfig(rid)
+	_, err = GetDanmuConfig(rid)
 	if err != nil {
 		t.Fatalf("GetDanmuConfig failed: %v", err)
 	}
-	t.Logf("Danmu config: %+v", rsp)
 }

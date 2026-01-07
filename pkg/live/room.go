@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"time"
 
+	"uooobarry/yuuna-danmu/pkg/bilibili"
 	"uooobarry/yuuna-danmu/pkg/errors"
-	"uooobarry/yuuna-danmu/pkg/wbi"
 )
 
 type RoomInitResp struct {
@@ -43,7 +43,7 @@ type HostInfo struct {
 func GetRealRoomID(roomID int) (int, error) {
 	api := fmt.Sprintf("https://api.live.bilibili.com/room/v1/Room/room_init?id=%d", roomID)
 
-	resp, err := wbi.BiliClient.Get(api)
+	resp, err := bilibili.AuthClient.Get(api)
 	if err != nil {
 		return 0, err
 	}
@@ -67,11 +67,11 @@ func GetDanmuConfig(roomID int) (*DanmuInfoResp, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err = wbi.Sign(apiUrl); err != nil {
+	if err = bilibili.Sign(apiUrl); err != nil {
 		return nil, err
 	}
 
-	resp, err := wbi.BiliClient.Get(apiUrl.String())
+	resp, err := bilibili.AuthClient.Get(apiUrl.String())
 	if err != nil {
 		return nil, err
 	}

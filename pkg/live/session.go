@@ -9,29 +9,35 @@ import (
 )
 
 type Session struct {
-	RoomID     int
-	EventCh    chan Event
-	ctx        context.Context
-	cancel     context.CancelFunc
-	wg         sync.WaitGroup
-	mu         sync.Mutex
-	Cookie     string
-	RealRoomID int
+	RoomID      int
+	EventCh     chan Event
+	ctx         context.Context
+	cancel      context.CancelFunc
+	wg          sync.WaitGroup
+	mu          sync.Mutex
+	RealRoomID  int
+	authContext *AuthContext
 }
 
-func NewSession(roomID int, cookie string) *Session {
-	return &Session{
+func NewSession(roomID int, cookie string) (*Session, error) {
+	session := &Session{
 		RoomID:  roomID,
 		EventCh: make(chan Event, 100),
-		Cookie:  cookie,
 	}
+
+	err := session.prepareAuth(cookie)
+	if err != nil {
+		return nil, err
+	}
+	return session, nil
 }
 
-func (session *Session) UpdateConfig(roomID int, cookie string) {
+func (session *Session) UpdateConfig(roomID int, cookie string) error {
 	session.mu.Lock()
 	defer session.mu.Unlock()
 	session.RoomID = roomID
-	session.Cookie = cookie
+	err := session.prepareAuth(cookie)
+	return err
 }
 
 func (session *Session) Start() error {
@@ -84,7 +90,7 @@ func (session *Session) connectLoop(hosts []HostInfo, token string) {
 				return
 			default:
 				session.sendSysMsg(fmt.Sprintf("[Yuuna-Danmu] Connecting to host [%d/%d]: %s:%d", i+1, len(hosts), host, hostInfo.WssPort))
-				c := NewClient(session, host, hostInfo.WssPort, token)
+				c := session.NewClient(host, hostInfo.WssPort, token)
 
 				err := c.Run(session.ctx)
 
@@ -111,7 +117,6 @@ func (session *Session) connectLoop(hosts []HostInfo, token string) {
 }
 
 func (session *Session) sendSysMsg(msg string) {
-	log.Println(msg)
 	session.EventCh <- Event{
 		Type:      SysMsgEvent,
 		Data:      msg,
@@ -120,7 +125,6 @@ func (session *Session) sendSysMsg(msg string) {
 }
 
 func (session *Session) sendErrorEvent(errStr string) {
-	log.Println(errStr)
 	session.EventCh <- Event{
 		Type:      ErrorEvent,
 		Data:      errStr,
