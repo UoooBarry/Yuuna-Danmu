@@ -33,6 +33,13 @@ func NewWailsUI(assetOts *assetserver.Options, opts ...func(*WailsUI)) *WailsUI 
 	return ui
 }
 
+func (w *WailsUI) Stop() error {
+	if w.ctx != nil {
+		runtime.Quit(w.ctx)
+	}
+	return nil
+}
+
 func (w *WailsUI) SetContext(ctx context.Context) {
 	w.ctx = ctx
 }

@@ -32,6 +32,20 @@ wails dev
 
 ```
 
+如果需要开启Debug模式请在下面文件中将json中的`debug: false`改为`debug: true`
+```jsonc
+ /* Windows %APPDATA%\yuuna-danmu\config.json C:\Users\Username\AppData\Roaming\yuuna-danmu/config.json
+    macOS	/Users/Username/Library/Application\ Support/yuuna-danmu/config.json
+    Linux / Unix	$XDG_CONFIG_HOME or ~/.config	/home/username/.config/yuuna-danmu/config.json
+ */
+
+{
+    "room_id": 1,
+    "cookie", "",
+    "debug": true
+}
+```
+
 2. **编译正式版**：
 ```bash
 wails build
@@ -39,6 +53,10 @@ wails build
 ```
 
 编译后的程序将出现在 `build/bin` 目录下。
+
+### API
+
+gRPC pb 文件位于 `api/grpc/pb`
 
 ### 界面预览
 
@@ -50,5 +68,6 @@ wails build
 * [X] **礼物显示**：显示投喂礼物，连击，图标等。
 * [ ] **更多消息类型**：完善舰长开通、醒目留言 (SC) 等解析。
 * [X] **自动重连机制**：针对 WebSocket 网络波动的自动恢复。
+* [X] **GRpc**：支持 gRPC 通信。
 * [ ] **主题自定义**：支持针对不同直播风格的皮肤切换。
 * [ ] **插件**：支持插件扩展。

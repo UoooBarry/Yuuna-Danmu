@@ -8,6 +8,7 @@ type UI interface {
 	AppendError(err error)
 	AppendSysMsg(msg string)
 	Start() error
+	Stop() error
 	SetOnConfigChange(onConfigChange OnConfigChange)
 	AppendSuperChat(superchat *live.SuperChatMsgData)
 }

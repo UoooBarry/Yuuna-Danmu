@@ -5,8 +5,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"uooobarry/yuuna-danmu/pkg/app"
+	"uooobarry/yuuna-danmu/pkg/server/grpc"
 	"uooobarry/yuuna-danmu/pkg/ui"
 
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -19,6 +21,7 @@ func main() {
 			Middleware: proxyHandler,
 		})),
 		app.WithFileLog("log/yuuna-danmu.log"),
+		app.WithServer(grpc.New(), 8080),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -28,8 +31,14 @@ func main() {
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-sigCh
+		go func() {
+			time.Sleep(1 * time.Second)
+			log.Println("[Yuuna-Danmu] Shutdown timed out, force exiting...")
+			os.Exit(1)
+		}()
+
 		app.Stop()
-		log.Printf("[Yuuna-Danmu] Session stopped")
+		os.Exit(0)
 	}()
 
 	if err := app.Run(); err != nil {
