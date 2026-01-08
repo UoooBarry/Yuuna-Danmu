@@ -1,73 +1,76 @@
 # Yuuna Danmu
 
-Go 轻量级 B 站直播弹幕监听工具。基于 **Wails** 和 **Svelte** 前端。
+轻量级 B 站直播弹幕监听工具，使用 Go 后端，基于 Wails 框架结合 Svelte 前端实现。
 
-参考文档基本出自 [哔哩哔哩 - API 收集整理](https://github.com/SocialSisterYi/bilibili-API-collect)
+API 参考主要来自 [哔哩哔哩-API-收集整理](https://github.com/SocialSisterYi/bilibili-API-collect)。
 
 ### 核心功能
 
-* **实时弹幕读取**：获取直播间观众发送的弹幕、牌子信息。
-* **礼物记录**：自动识别送礼行为。
-* **配置持久化**：自动保存房间号及 Cookie，支持跨平台路径。
-* **多平台支持**：支持 Windows、Linux、macOS。
+- 实时接收直播间弹幕及相关信息（包括牌子、礼物等）
+- 自动记录礼物投喂
+- 配置自动保存（房间号、Cookie），跨平台路径处理
+- 支持 Windows、Linux、macOS
 
 ### 技术栈
 
-* **Backend**: Go 1.25
-* **Frontend**: Svelte + HTML/CSS (Via Wails)
-* **Communication**: WebSocket (Gorilla) & JSON-RPC
+- 后端：Go 1.25
+- 前端：Svelte（通过 Wails 集成）
+- 通信：WebSocket（gorilla/websocket）与 JSON-RPC
+- 扩展接口：gRPC（proto 文件位于 `api/grpc/pb`）
 
-### 如何使用
+设计目标：保持简洁、无多余配置，支持跨平台，提供 gRPC 接口便于第三方扩展或集成。
 
-#### 开发环境准备
+### 使用方法
 
-1. 安装 [Wails CLI](https://wails.io/docs/gettingstarted/installation)。
-2. 确保已安装 Node.js 和 Go 环境。
+#### 开发环境
 
-#### 运行与编译
+1. 安装 [Wails CLI](https://wails.io/docs/gettingstarted/installation)
+2. 准备好 Node.js 和 Go 环境
 
-1. **开发模式**（支持前端热更新）：
-```bash
-wails dev
+#### 运行与打包
 
-```
+- 开发模式（支持前端热重载）：
+  ```bash
+  wails dev
+  ```
 
-如果需要开启Debug模式请在下面文件中将json中的`debug: false`改为`debug: true`
-```jsonc
- /* Windows %APPDATA%\yuuna-danmu\config.json C:\Users\Username\AppData\Roaming\yuuna-danmu/config.json
-    macOS	/Users/Username/Library/Application\ Support/yuuna-danmu/config.json
-    Linux / Unix	$XDG_CONFIG_HOME or ~/.config	/home/username/.config/yuuna-danmu/config.json
- */
+- 打包正式版：
+  ```bash
+  wails build
+  ```
+  可执行文件会生成在 `build/bin` 目录。
 
+#### 配置
+
+配置文件路径（程序首次运行时自动创建）：
+
+- Windows：`%APPDATA%\yuuna-danmu\config.json`
+- macOS：`~/Library/Application Support/yuuna-danmu/config.json`
+- Linux：`~/.config/yuuna-danmu/config.json`
+
+示例内容：
+```json
 {
-    "room_id": 1,
-    "cookie", "",
-    "debug": true
+  "room_id": 1,
+  "cookie": "",
+  "debug": false
 }
 ```
-
-2. **编译正式版**：
-```bash
-wails build
-
-```
-
-编译后的程序将出现在 `build/bin` 目录下。
-
-### API
-
-gRPC pb 文件位于 `api/grpc/pb`
+开发时可将 `debug` 设为 `true` 以开启调试模式。
 
 ### 界面预览
 
-![img](./doc/preview.png)
+![preview](./doc/preview.png)
 
-### 开发计划
+### 已完成
 
-* [x] **Wails 界面集成**：CLI 到 GUI。
-* [X] **礼物显示**：显示投喂礼物，连击，图标等。
-* [ ] **更多消息类型**：完善舰长开通、醒目留言 (SC) 等解析。
-* [X] **自动重连机制**：针对 WebSocket 网络波动的自动恢复。
-* [X] **GRpc**：支持 gRPC 通信。
-* [ ] **主题自定义**：支持针对不同直播风格的皮肤切换。
-* [ ] **插件**：支持插件扩展。
+- [X] Wails GUI 界面
+- [X] 礼物显示（含连击、图标）
+- [X] WebSocket 自动重连
+- [X] gRPC 服务支持
+
+### 计划中
+
+- [] 更多消息类型解析（舰长、醒目留言等）
+- [] 主题/皮肤切换
+- [] 插件系统
