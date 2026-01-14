@@ -113,7 +113,7 @@ func (app *App) runSession() {
 		ctx, cancel := context.WithCancel(context.Background())
 		app.cancelMock = cancel
 		app.ui.AppendSysMsg("[Debug Mode] Starting mock driver...")
-		app.startMockDriver(ctx)
+		startMockDriver(ctx, app.session.EventCh)
 	} else {
 		if err := app.session.Start(); err != nil {
 			app.ui.AppendError(err)

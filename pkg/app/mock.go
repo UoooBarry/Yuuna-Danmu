@@ -8,7 +8,7 @@ import (
 	"uooobarry/yuuna-danmu/pkg/live"
 )
 
-func (app *App) startMockDriver(ctx context.Context) {
+func startMockDriver(ctx context.Context, ch chan live.Event) {
 	danmuTicker := time.NewTicker(2 * time.Second)
 	defer danmuTicker.Stop()
 
@@ -24,8 +24,7 @@ func (app *App) startMockDriver(ctx context.Context) {
 	}
 	for {
 		select {
-		case <-ctx.Done(): // 1. Check if we should stop
-			app.ui.AppendSysMsg("[Mock] Stopping driver...")
+		case <-ctx.Done():
 			return
 		case <-danmuTicker.C:
 			mockDanmu := &live.DanmuMsg{
@@ -35,7 +34,7 @@ func (app *App) startMockDriver(ctx context.Context) {
 				MedalLevel: 20,
 			}
 
-			app.session.EventCh <- live.Event{
+			ch <- live.Event{
 				Type: live.DanmuEvent,
 				Data: mockDanmu,
 			}
@@ -62,7 +61,7 @@ func (app *App) startMockDriver(ctx context.Context) {
 					ComboNum: 1,
 				},
 			}
-			app.session.EventCh <- live.Event{
+			ch <- live.Event{
 				Type: live.GiftEvent,
 				Data: mockGift,
 			}
@@ -79,7 +78,7 @@ func (app *App) startMockDriver(ctx context.Context) {
 				StartTime: time.Now().Unix(),
 				EndTime:   time.Now().Add(time.Minute).Unix(),
 			}
-			app.session.EventCh <- live.Event{
+			ch <- live.Event{
 				Type: live.SuperChatEvent,
 				Data: mockSuperChat,
 			}
