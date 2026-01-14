@@ -170,10 +170,6 @@ func (app *App) handleEvent(event live.Event) {
 			app.ui.AppendSuperChat(sc)
 		}
 	}
-
-	for _, s := range app.servers {
-		s.Target.Dispatch(event.Data)
-	}
 }
 
 func (app *App) initServers() {
