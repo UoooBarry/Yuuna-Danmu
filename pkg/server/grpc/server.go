@@ -16,11 +16,13 @@ type GRPCServer struct {
 	mu          sync.RWMutex
 	subscribers map[chan *pb.LiveEvent]struct{}
 	grpcServer  *grpc.Server
+	isRunning   bool
 }
 
 func New() *GRPCServer {
 	return &GRPCServer{
 		subscribers: make(map[chan *pb.LiveEvent]struct{}),
+		isRunning:   false,
 	}
 }
 
@@ -39,6 +41,8 @@ func (s *GRPCServer) Start(port int) error {
 			log.Printf("gRPC server error: %v", err)
 		}
 	}()
+
+	s.isRunning = true
 	return nil
 }
 
@@ -72,7 +76,6 @@ func (s *GRPCServer) Subscribe(_ *pb.Empty, stream pb.LiveService_SubscribeServe
 }
 
 func (s *GRPCServer) Dispatch(event any) {
-	log.Printf("Dispatching clean event: %v", event)
 	pbEvent := s.mapToProto(event)
 	if pbEvent == nil {
 		return
@@ -90,5 +93,10 @@ func (s *GRPCServer) Dispatch(event any) {
 
 func (s *GRPCServer) Stop() error {
 	s.grpcServer.GracefulStop()
+	s.isRunning = false
 	return nil
+}
+
+func (s *GRPCServer) IsRunning() bool {
+	return s.isRunning
 }

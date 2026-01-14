@@ -48,9 +48,9 @@ func (t *TerminalUI) AppendSysMsg(msg string) {
 	fmt.Printf("[%s] [系统] %s\n", time.Now().Format(time.TimeOnly), msg)
 }
 
-func (t *TerminalUI) SaveConfig(roomID int, cookie string) string {
+func (t *TerminalUI) SaveConfig(payload ConfigPayload) string {
 	if t.onConfigChange != nil {
-		err := t.onConfigChange(roomID, cookie)
+		err := t.onConfigChange(payload)
 		if err != nil {
 			return "更新失败: " + err.Error()
 		}

@@ -12,6 +12,7 @@
   let showSettings = false;
   let roomID = 50819;
   let cookie = "";
+  let servers: any[] = [];
 
   const scrollToBottom = async () => {
     if (container) {
@@ -21,11 +22,14 @@
   };
 
   onMount(() => {
-    LoadConfig().then((config: { room_id: number; cookie: string }) => {
-      roomID = Number(config.room_id);
-      cookie = config.cookie;
-      EventsEmit("SYS_MSG", "loaded config");
-    });
+    LoadConfig().then(
+      (config: { room_id: number; cookie: string; servers: any[] }) => {
+        roomID = Number(config.room_id);
+        cookie = config.cookie;
+        servers = config.servers || [];
+        EventsEmit("SYS_MSG", "loaded config");
+      },
+    );
 
     EventsOn("DANMU_MSG", (data) => {
       danmuList = [...danmuList, { ...data, type: "danmu" }];
@@ -74,11 +78,11 @@
   });
 
   function handleScFinished(startTime: number) {
-    scList = scList.filter(s => s.start_time !== startTime);
+    scList = scList.filter((s) => s.start_time !== startTime);
   }
 
   async function handleSave() {
-    await SaveConfig({ room_id: Number(roomID), cookie: cookie });
+    await SaveConfig({ room_id: Number(roomID), cookie: cookie, servers: servers });
     danmuList = [];
     showSettings = false;
   }
@@ -86,6 +90,11 @@
   function getProxyUrl(originalUrl: string) {
     if (!originalUrl) return "";
     return `/proxy?url=${encodeURIComponent(originalUrl)}`;
+  }
+
+  function toggleServer(index: number) {
+    servers[index].enabled = !servers[index].enabled;
+    servers = [...servers]; // Trigger Svelte reactivity
   }
 </script>
 
@@ -144,16 +153,42 @@
             rows="5"
           ></textarea>
         </div>
+
+        <div class="servers-section">
+          <label for="servers-section">Server Settings</label>
+          {#each servers as server, i}
+            <div class="server-item">
+              <div class="server-row">
+                <span class="server-name">{server.name} ({server.type})</span>
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    checked={server.enabled}
+                    on:change={() => toggleServer(i)}
+                  />
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="server-row">
+                <input
+                  type="number"
+                  bind:value={server.port}
+                  placeholder="Port"
+                />
+              </div>
+            </div>
+          {/each}
+        </div>
         <button class="save-btn" on:click={handleSave}>Apply & Restart</button>
       </div>
     {:else}
       {#if scList.length > 0}
         <div class="pinned-sc-area">
           {#each scList as sc (sc.start_time)}
-            <SuperChatCard 
-              data={sc} 
-              {getProxyUrl} 
-              onFinished={handleScFinished} 
+            <SuperChatCard
+              data={sc}
+              {getProxyUrl}
+              onFinished={handleScFinished}
             />
           {/each}
         </div>
@@ -551,9 +586,16 @@
   }
 
   @keyframes comboPop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.6) rotate(-5deg); color: var(--gold); }
-    100% { transform: scale(1) rotate(0); }
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.6) rotate(-5deg);
+      color: var(--gold);
+    }
+    100% {
+      transform: scale(1) rotate(0);
+    }
   }
 
   .coin-badge {
@@ -577,20 +619,102 @@
 
   .pinned-sc-area {
     display: flex;
-    flex-direction: row; 
-    gap: 12px;           
+    flex-direction: row;
+    gap: 12px;
     padding: 12px;
-    overflow-x: auto;    
+    overflow-x: auto;
     overflow-y: hidden;
     min-height: 110px;
     background: transparent;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    
-    scrollbar-width: none; 
+
+    scrollbar-width: none;
     -ms-overflow-style: none;
   }
 
   .pinned-sc-area::-webkit-scrollbar {
     display: none;
+  }
+  .servers-section {
+    color: var(--iris);
+    margin-top: 1.5rem;
+    font-size: 11px;
+    border-top: 1px solid var(--muted);
+    padding-top: 1rem;
+  }
+
+  .servers-section label {
+    color: var(--iris);
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  .server-item {
+    background: var(--overlay);
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border: 1px solid transparent;
+    transition: border 0.2s;
+  }
+
+  .server-item:hover {
+    border: 1px solid var(--muted);
+  }
+
+  .server-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .server-name {
+    color: var(--text);
+    font-family: "JetBrains Mono", monospace; /* Very Rose Pine style */
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 20px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--muted);
+    transition: 0.4s;
+    border-radius: 20px;
+  }
+
+  input:checked + .slider {
+    background-color: var(--pine);
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--text);
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(14px);
   }
 </style>

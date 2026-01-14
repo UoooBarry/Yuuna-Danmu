@@ -1,6 +1,9 @@
 package ui
 
-import "uooobarry/yuuna-danmu/pkg/live"
+import (
+	"uooobarry/yuuna-danmu/pkg/config"
+	"uooobarry/yuuna-danmu/pkg/live"
+)
 
 type UI interface {
 	AppendDanmu(medalName string, medalLevel int, nickname, content string)
@@ -11,4 +14,10 @@ type UI interface {
 	Stop() error
 	SetOnConfigChange(onConfigChange OnConfigChange)
 	AppendSuperChat(superchat *live.SuperChatMsgData)
+}
+
+type ConfigPayload struct {
+	RoomID  int                     `json:"room_id"`
+	Cookie  string                  `json:"cookie"`
+	Servers []config.ServerSettings `json:"servers"`
 }

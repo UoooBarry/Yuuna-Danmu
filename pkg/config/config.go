@@ -2,17 +2,37 @@ package config
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 	"path/filepath"
 )
 
 type AppConfig struct {
-	RoomID int    `json:"room_id"`
-	Cookie string `json:"cookie"`
-	Debug  bool   `json:"debug"`
+	RoomID  int              `json:"room_id"`
+	Cookie  string           `json:"cookie"`
+	Debug   bool             `json:"debug"`
+	Servers []ServerSettings `json:"servers"`
 }
 
-var defaultConfig = &AppConfig{RoomID: 23990839, Cookie: "", Debug: false}
+type ServerSettings struct {
+	Name    string     `json:"name"`
+	Type    ServerType `json:"type"`
+	Port    int        `json:"port"`
+	Enabled bool       `json:"enabled"`
+}
+
+var defaultConfig = &AppConfig{
+	RoomID: 23990839,
+	Cookie: "",
+	Debug:  false,
+	Servers: []ServerSettings{
+		{Name: "gRPC", Type: "grpc", Port: 50051, Enabled: false},
+	},
+}
+
+type ServerType string
+
+var GRPC ServerType = "grpc"
 
 func GetConfigPath() string {
 	userConfigDir, _ := os.UserConfigDir()
@@ -33,12 +53,17 @@ func Load() *AppConfig {
 	if err := json.Unmarshal(data, &cfg); err != nil {
 		return defaultConfig
 	}
+	if cfg.Servers == nil {
+		cfg.Servers = defaultConfig.Servers
+	}
 	return &cfg
 }
 
 func (cfg *AppConfig) Save() error {
 	path := GetConfigPath()
 	data, err := json.MarshalIndent(cfg, "", "  ")
+
+	log.Println(string(data))
 	if err != nil {
 		return err
 	}
