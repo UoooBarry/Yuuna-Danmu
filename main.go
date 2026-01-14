@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"uooobarry/yuuna-danmu/pkg/app"
-	"uooobarry/yuuna-danmu/pkg/server/grpc"
 	"uooobarry/yuuna-danmu/pkg/ui"
 
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -21,7 +20,6 @@ func main() {
 			Middleware: proxyHandler,
 		})),
 		app.WithFileLog("log/yuuna-danmu.log"),
-		app.WithServer(grpc.New(), 8080),
 	)
 	if err != nil {
 		log.Fatal(err)

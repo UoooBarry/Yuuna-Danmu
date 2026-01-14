@@ -3,7 +3,6 @@ package ui
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"uooobarry/yuuna-danmu/pkg/config"
@@ -23,7 +22,7 @@ type WailsUI struct {
 	assetOpts      *assetserver.Options
 }
 
-type OnConfigChange func(roomID int, cookie string) error
+type OnConfigChange func(payload ConfigPayload) error
 
 func NewWailsUI(assetOts *assetserver.Options, opts ...func(*WailsUI)) *WailsUI {
 	ui := &WailsUI{
@@ -55,8 +54,8 @@ func (w *WailsUI) SetOnConfigChange(onConfigChange OnConfigChange) {
 func (w *WailsUI) Start() error {
 	return wails.Run(&options.App{
 		Title:            "Yuuna Danmu",
-		Width:            320,
-		Height:           520,
+		Width:            384,
+		Height:           624,
 		Frameless:        true,
 		AlwaysOnTop:      true,
 		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0},
@@ -100,7 +99,6 @@ func (w *WailsUI) AppendSuperChat(superchat *live.SuperChatMsgData) {
 		return
 	}
 
-	log.Println(superchat)
 	w.emitter(w.ctx, live.SuperChatEvent, superchat)
 }
 
@@ -120,14 +118,9 @@ func (w *WailsUI) AppendSysMsg(msg string) {
 	w.emitter(w.ctx, live.SysMsgEvent, msg)
 }
 
-type configPayload struct {
-	RoomID int    `json:"room_id"`
-	Cookie string `json:"cookie"`
-}
-
-func (w *WailsUI) SaveConfig(payload configPayload) {
+func (w *WailsUI) SaveConfig(payload ConfigPayload) {
 	if w.onConfigChange != nil {
-		err := w.onConfigChange(payload.RoomID, payload.Cookie)
+		err := w.onConfigChange(payload)
 		if err != nil {
 			w.AppendError(err)
 		}

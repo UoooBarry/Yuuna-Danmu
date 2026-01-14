@@ -9,6 +9,7 @@ import (
 	"uooobarry/yuuna-danmu/pkg/config"
 	"uooobarry/yuuna-danmu/pkg/live"
 	"uooobarry/yuuna-danmu/pkg/server"
+	"uooobarry/yuuna-danmu/pkg/server/grpc"
 	"uooobarry/yuuna-danmu/pkg/ui"
 )
 
@@ -30,8 +31,8 @@ type Option func(*App)
 func WithUI(u ui.UI) Option {
 	return func(app *App) {
 		app.ui = u
-		app.ui.SetOnConfigChange(func(roomID int, cookie string) error {
-			return app.RestartSession(roomID, cookie)
+		app.ui.SetOnConfigChange(func(payload ui.ConfigPayload) error {
+			return app.reload(payload)
 		})
 	}
 }
@@ -78,63 +79,31 @@ func NewApp(opts ...Option) (*App, error) {
 }
 
 func (app *App) Run() error {
-	go func() {
-		for event := range app.session.EventCh {
-			switch event.Type {
-			case live.DanmuEvent:
-				if d, ok := event.Data.(*live.DanmuMsg); ok {
-					app.ui.AppendDanmu(d.MedalName, d.MedalLevel, d.Nickname, d.Content)
-				}
-			case live.GiftEvent:
-				if g, ok := event.Data.(*live.GiftData); ok {
-					app.ui.AppendGift(g)
-				}
-			case live.ErrorEvent:
-				if e, ok := event.Data.(string); ok {
-					app.ui.AppendError(errors.New(e))
-				}
-			case live.SysMsgEvent:
-				if msg, ok := event.Data.(string); ok {
-					app.ui.AppendSysMsg(msg)
-				}
-			case live.SuperChatEvent:
-				if sc, ok := event.Data.(*live.SuperChatMsgData); ok {
-					app.ui.AppendSuperChat(sc)
-				}
-			}
+	go app.consumeEvents()
 
-			for _, s := range app.servers {
-				s.Target.Dispatch(event.Data)
-			}
-		}
-	}()
+	app.initServers()
 
 	go app.runSession()
-
-	for _, s := range app.servers {
-		s.Target.Start(s.Port)
-	}
 
 	return app.ui.Start()
 }
 
-func (app *App) RestartSession(newRoomID int, newCookie string) error {
-	config := &config.AppConfig{
-		RoomID: newRoomID,
-		Cookie: newCookie,
-		Debug:  app.AppConfig.Debug,
-	}
-	config.Save()
+func (app *App) reload(payload ui.ConfigPayload) error {
 	if app.session != nil {
 		app.session.Stop()
 	}
 
-	app.AppConfig = *config
-	app.session.UpdateConfig(newRoomID, newCookie)
+	app.AppConfig.RoomID = payload.RoomID
+	app.AppConfig.Cookie = payload.Cookie
+	app.AppConfig.Servers = payload.Servers
+	app.AppConfig.Save()
+
+	app.session.UpdateConfig(payload.RoomID, payload.Cookie)
+
 	app.ui.AppendSysMsg("[Yuuna-Danmu]Session restarting...")
-	if !app.AppConfig.Debug {
-		go app.runSession()
-	}
+
+	app.initServers()
+	go app.runSession()
 
 	return nil
 }
@@ -164,5 +133,59 @@ func (app *App) Stop() {
 		app.session.Stop()
 	}
 	app.ui.Stop()
+	app.servers = []*ServerConfig{}
 	log.Printf("[Yuuna-Danmu]App stopped")
+}
+
+func (app *App) consumeEvents() {
+	for event := range app.session.EventCh {
+		app.handleEvent(event)
+
+		for _, s := range app.servers {
+			s.Target.Dispatch(event.Data)
+		}
+	}
+}
+
+func (app *App) handleEvent(event live.Event) {
+	switch event.Type {
+	case live.DanmuEvent:
+		if d, ok := event.Data.(*live.DanmuMsg); ok {
+			app.ui.AppendDanmu(d.MedalName, d.MedalLevel, d.Nickname, d.Content)
+		}
+	case live.GiftEvent:
+		if g, ok := event.Data.(*live.GiftData); ok {
+			app.ui.AppendGift(g)
+		}
+	case live.ErrorEvent:
+		if e, ok := event.Data.(string); ok {
+			app.ui.AppendError(errors.New(e))
+		}
+	case live.SysMsgEvent:
+		if msg, ok := event.Data.(string); ok {
+			app.ui.AppendSysMsg(msg)
+		}
+	case live.SuperChatEvent:
+		if sc, ok := event.Data.(*live.SuperChatMsgData); ok {
+			app.ui.AppendSuperChat(sc)
+		}
+	}
+
+	for _, s := range app.servers {
+		s.Target.Dispatch(event.Data)
+	}
+}
+
+func (app *App) initServers() {
+	for _, s := range app.servers {
+		s.Target.Stop()
+	}
+	app.servers = nil
+	for _, s := range app.AppConfig.Servers {
+		if s.Type == config.GRPC && s.Enabled {
+			server := grpc.New()
+			app.servers = append(app.servers, &ServerConfig{Target: server, Port: s.Port})
+			go server.Start(s.Port)
+		}
+	}
 }
