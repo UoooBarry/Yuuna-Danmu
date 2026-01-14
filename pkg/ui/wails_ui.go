@@ -3,7 +3,6 @@ package ui
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"uooobarry/yuuna-danmu/pkg/config"
@@ -121,7 +120,6 @@ func (w *WailsUI) AppendSysMsg(msg string) {
 
 func (w *WailsUI) SaveConfig(payload ConfigPayload) {
 	if w.onConfigChange != nil {
-		log.Println(payload)
 		err := w.onConfigChange(payload)
 		if err != nil {
 			w.AppendError(err)

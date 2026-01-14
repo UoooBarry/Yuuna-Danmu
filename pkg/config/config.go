@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -62,8 +61,6 @@ func Load() *AppConfig {
 func (cfg *AppConfig) Save() error {
 	path := GetConfigPath()
 	data, err := json.MarshalIndent(cfg, "", "  ")
-
-	log.Println(string(data))
 	if err != nil {
 		return err
 	}
