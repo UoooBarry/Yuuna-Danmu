@@ -3,8 +3,8 @@ package grpc
 import (
 	"log"
 
+	"uooobarry/yuuna-danmu/api/grpc/pb"
 	"uooobarry/yuuna-danmu/pkg/live"
-	"uooobarry/yuuna-danmu/pkg/server/grpc/pb"
 )
 
 func (s *GRPCServer) mapToProto(event any) *pb.LiveEvent {
@@ -83,6 +83,19 @@ func (s *GRPCServer) mapToProto(event any) *pb.LiveEvent {
 			},
 		}
 
+	case *live.InteractMsg:
+		log.Println("InteractMsg", string(e.Data))
+		return &pb.LiveEvent{
+			Payload: &pb.LiveEvent_Interaction{
+				Interaction: &pb.InteractMsg{
+					Id:     e.ID,
+					Status: int32(e.Status),
+					Type:   int32(e.Type),
+					Data:   string(e.Data),
+				},
+			},
+		}
+
 	case string:
 		return &pb.LiveEvent{
 			Payload: &pb.LiveEvent_SysMsg{
@@ -95,4 +108,3 @@ func (s *GRPCServer) mapToProto(event any) *pb.LiveEvent {
 		return nil
 	}
 }
-

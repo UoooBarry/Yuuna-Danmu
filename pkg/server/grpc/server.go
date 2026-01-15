@@ -6,7 +6,7 @@ import (
 	"net"
 	"sync"
 
-	"uooobarry/yuuna-danmu/pkg/server/grpc/pb"
+	"uooobarry/yuuna-danmu/api/grpc/pb"
 
 	"google.golang.org/grpc"
 )

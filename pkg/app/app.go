@@ -185,6 +185,10 @@ func (app *App) handleEvent(event live.Event) {
 }
 
 func (app *App) checkCookie() {
+	if app.AppConfig.Debug {
+		return
+	}
+
 	if app.AppConfig.Cookie == "" || app.AppConfig.RefreshToken == "" {
 		return
 	}

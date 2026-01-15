@@ -18,6 +18,7 @@ message LiveEvent {
     string sys_msg = 4;
     string error = 5;
     SuperChatMsg super_chat = 6;
+    InteractMsg interaction = 7;
   }
 }
 
@@ -77,4 +78,29 @@ message SuperChatMsg {
   UserInfo user_info = 5;
   int64 start_time = 6;
   int64 end_time = 7;
+}
+
+message InteractMsg {
+  int64 id = 1;
+  int32 status = 2;
+  int32 type = 3;
+  string data = 4;
+}
+
+message InteractData102 {
+  repeated InteractCombo combo = 1;
+}
+
+message InteractCombo {
+  int64 id = 1;
+  int32 status = 2;
+  string content = 3;
+  int32 cnt = 4;
+  string guide = 5;
+}
+
+message InteractDataNotice {
+  int32 cnt = 1;
+  string suffix_text = 2;
+  int32 gift_id = 3;
 }

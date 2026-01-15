@@ -9,7 +9,6 @@ type Event struct {
 	Timestamp int64
 }
 
-// DanmuData 简单的弹幕结构
 type DanmuData struct {
 	UID      int64
 	Nickname string
@@ -79,12 +78,12 @@ type UserInfo struct {
 }
 
 var (
-	DanmuEvent      = "DANMU_MSG"
-	PopularityEvent = "POPULARITY"
-	GiftEvent       = "SEND_GIFT"
-	SysMsgEvent     = "SYS_MSG"
-	ErrorEvent      = "SYS_ERROR"
-	SuperChatEvent  = "SUPER_CHAT_MESSAGE"
+	DanmuEvent       = "DANMU_MSG"
+	PopularityEvent  = "POPULARITY"
+	GiftEvent        = "SEND_GIFT"
+	SysMsgEvent      = "SYS_MSG"
+	ErrorEvent       = "SYS_ERROR"
+	SuperChatEvent   = "SUPER_CHAT_MESSAGE"
 	InteractionEvent = "DM_INTERACTION"
 )
 

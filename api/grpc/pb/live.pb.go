@@ -67,6 +67,7 @@ type LiveEvent struct {
 	//	*LiveEvent_SysMsg
 	//	*LiveEvent_Error
 	//	*LiveEvent_SuperChat
+	//	*LiveEvent_Interaction
 	Payload       isLiveEvent_Payload `protobuf_oneof:"payload"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -163,6 +164,15 @@ func (x *LiveEvent) GetSuperChat() *SuperChatMsg {
 	return nil
 }
 
+func (x *LiveEvent) GetInteraction() *InteractMsg {
+	if x != nil {
+		if x, ok := x.Payload.(*LiveEvent_Interaction); ok {
+			return x.Interaction
+		}
+	}
+	return nil
+}
+
 type isLiveEvent_Payload interface {
 	isLiveEvent_Payload()
 }
@@ -191,6 +201,10 @@ type LiveEvent_SuperChat struct {
 	SuperChat *SuperChatMsg `protobuf:"bytes,6,opt,name=super_chat,json=superChat,proto3,oneof"`
 }
 
+type LiveEvent_Interaction struct {
+	Interaction *InteractMsg `protobuf:"bytes,7,opt,name=interaction,proto3,oneof"`
+}
+
 func (*LiveEvent_Danmu) isLiveEvent_Payload() {}
 
 func (*LiveEvent_Popularity) isLiveEvent_Payload() {}
@@ -202,6 +216,8 @@ func (*LiveEvent_SysMsg) isLiveEvent_Payload() {}
 func (*LiveEvent_Error) isLiveEvent_Payload() {}
 
 func (*LiveEvent_SuperChat) isLiveEvent_Payload() {}
+
+func (*LiveEvent_Interaction) isLiveEvent_Payload() {}
 
 type DanmuMsg struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -763,12 +779,260 @@ func (x *SuperChatMsg) GetEndTime() int64 {
 	return 0
 }
 
+type InteractMsg struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Status        int32                  `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"`
+	Type          int32                  `protobuf:"varint,3,opt,name=type,proto3" json:"type,omitempty"`
+	Data          string                 `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InteractMsg) Reset() {
+	*x = InteractMsg{}
+	mi := &file_api_grpc_pb_live_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InteractMsg) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InteractMsg) ProtoMessage() {}
+
+func (x *InteractMsg) ProtoReflect() protoreflect.Message {
+	mi := &file_api_grpc_pb_live_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InteractMsg.ProtoReflect.Descriptor instead.
+func (*InteractMsg) Descriptor() ([]byte, []int) {
+	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *InteractMsg) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *InteractMsg) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *InteractMsg) GetType() int32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *InteractMsg) GetData() string {
+	if x != nil {
+		return x.Data
+	}
+	return ""
+}
+
+type InteractData102 struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Combo         []*InteractCombo       `protobuf:"bytes,1,rep,name=combo,proto3" json:"combo,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InteractData102) Reset() {
+	*x = InteractData102{}
+	mi := &file_api_grpc_pb_live_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InteractData102) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InteractData102) ProtoMessage() {}
+
+func (x *InteractData102) ProtoReflect() protoreflect.Message {
+	mi := &file_api_grpc_pb_live_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InteractData102.ProtoReflect.Descriptor instead.
+func (*InteractData102) Descriptor() ([]byte, []int) {
+	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *InteractData102) GetCombo() []*InteractCombo {
+	if x != nil {
+		return x.Combo
+	}
+	return nil
+}
+
+type InteractCombo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Status        int32                  `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"`
+	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+	Cnt           int32                  `protobuf:"varint,4,opt,name=cnt,proto3" json:"cnt,omitempty"`
+	Guide         string                 `protobuf:"bytes,5,opt,name=guide,proto3" json:"guide,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InteractCombo) Reset() {
+	*x = InteractCombo{}
+	mi := &file_api_grpc_pb_live_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InteractCombo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InteractCombo) ProtoMessage() {}
+
+func (x *InteractCombo) ProtoReflect() protoreflect.Message {
+	mi := &file_api_grpc_pb_live_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InteractCombo.ProtoReflect.Descriptor instead.
+func (*InteractCombo) Descriptor() ([]byte, []int) {
+	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *InteractCombo) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *InteractCombo) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *InteractCombo) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *InteractCombo) GetCnt() int32 {
+	if x != nil {
+		return x.Cnt
+	}
+	return 0
+}
+
+func (x *InteractCombo) GetGuide() string {
+	if x != nil {
+		return x.Guide
+	}
+	return ""
+}
+
+type InteractDataNotice struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Cnt           int32                  `protobuf:"varint,1,opt,name=cnt,proto3" json:"cnt,omitempty"`
+	SuffixText    string                 `protobuf:"bytes,2,opt,name=suffix_text,json=suffixText,proto3" json:"suffix_text,omitempty"`
+	GiftId        int32                  `protobuf:"varint,3,opt,name=gift_id,json=giftId,proto3" json:"gift_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InteractDataNotice) Reset() {
+	*x = InteractDataNotice{}
+	mi := &file_api_grpc_pb_live_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InteractDataNotice) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InteractDataNotice) ProtoMessage() {}
+
+func (x *InteractDataNotice) ProtoReflect() protoreflect.Message {
+	mi := &file_api_grpc_pb_live_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InteractDataNotice.ProtoReflect.Descriptor instead.
+func (*InteractDataNotice) Descriptor() ([]byte, []int) {
+	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *InteractDataNotice) GetCnt() int32 {
+	if x != nil {
+		return x.Cnt
+	}
+	return 0
+}
+
+func (x *InteractDataNotice) GetSuffixText() string {
+	if x != nil {
+		return x.SuffixText
+	}
+	return ""
+}
+
+func (x *InteractDataNotice) GetGiftId() int32 {
+	if x != nil {
+		return x.GiftId
+	}
+	return 0
+}
+
 var File_api_grpc_pb_live_proto protoreflect.FileDescriptor
 
 const file_api_grpc_pb_live_proto_rawDesc = "" +
 	"\n" +
 	"\x16api/grpc/pb/live.proto\x12\x04live\"\a\n" +
-	"\x05Empty\"\x83\x02\n" +
+	"\x05Empty\"\xba\x02\n" +
 	"\tLiveEvent\x12&\n" +
 	"\x05danmu\x18\x01 \x01(\v2\x0e.live.DanmuMsgH\x00R\x05danmu\x125\n" +
 	"\n" +
@@ -778,7 +1042,8 @@ const file_api_grpc_pb_live_proto_rawDesc = "" +
 	"\asys_msg\x18\x04 \x01(\tH\x00R\x06sysMsg\x12\x16\n" +
 	"\x05error\x18\x05 \x01(\tH\x00R\x05error\x123\n" +
 	"\n" +
-	"super_chat\x18\x06 \x01(\v2\x12.live.SuperChatMsgH\x00R\tsuperChatB\t\n" +
+	"super_chat\x18\x06 \x01(\v2\x12.live.SuperChatMsgH\x00R\tsuperChat\x125\n" +
+	"\vinteraction\x18\a \x01(\v2\x11.live.InteractMsgH\x00R\vinteractionB\t\n" +
 	"\apayload\"\x99\x01\n" +
 	"\bDanmuMsg\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\tR\acontent\x12\x17\n" +
@@ -834,7 +1099,25 @@ const file_api_grpc_pb_live_proto_rawDesc = "" +
 	"\tuser_info\x18\x05 \x01(\v2\x0e.live.UserInfoR\buserInfo\x12\x1d\n" +
 	"\n" +
 	"start_time\x18\x06 \x01(\x03R\tstartTime\x12\x19\n" +
-	"\bend_time\x18\a \x01(\x03R\aendTime2:\n" +
+	"\bend_time\x18\a \x01(\x03R\aendTime\"]\n" +
+	"\vInteractMsg\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\x05R\x06status\x12\x12\n" +
+	"\x04type\x18\x03 \x01(\x05R\x04type\x12\x12\n" +
+	"\x04data\x18\x04 \x01(\tR\x04data\"<\n" +
+	"\x0fInteractData102\x12)\n" +
+	"\x05combo\x18\x01 \x03(\v2\x13.live.InteractComboR\x05combo\"y\n" +
+	"\rInteractCombo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\x05R\x06status\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\x12\x10\n" +
+	"\x03cnt\x18\x04 \x01(\x05R\x03cnt\x12\x14\n" +
+	"\x05guide\x18\x05 \x01(\tR\x05guide\"`\n" +
+	"\x12InteractDataNotice\x12\x10\n" +
+	"\x03cnt\x18\x01 \x01(\x05R\x03cnt\x12\x1f\n" +
+	"\vsuffix_text\x18\x02 \x01(\tR\n" +
+	"suffixText\x12\x17\n" +
+	"\agift_id\x18\x03 \x01(\x05R\x06giftId2:\n" +
 	"\vLiveService\x12+\n" +
 	"\tSubscribe\x12\v.live.Empty\x1a\x0f.live.LiveEvent0\x01B#Z!uooobarry/yuuna-danmu/api/grpc/pbb\x06proto3"
 
@@ -850,36 +1133,42 @@ func file_api_grpc_pb_live_proto_rawDescGZIP() []byte {
 	return file_api_grpc_pb_live_proto_rawDescData
 }
 
-var file_api_grpc_pb_live_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_api_grpc_pb_live_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_api_grpc_pb_live_proto_goTypes = []any{
-	(*Empty)(nil),         // 0: live.Empty
-	(*LiveEvent)(nil),     // 1: live.LiveEvent
-	(*DanmuMsg)(nil),      // 2: live.DanmuMsg
-	(*PopularityMsg)(nil), // 3: live.PopularityMsg
-	(*GiftData)(nil),      // 4: live.GiftData
-	(*GiftInfo)(nil),      // 5: live.GiftInfo
-	(*MedalInfo)(nil),     // 6: live.MedalInfo
-	(*ComboSend)(nil),     // 7: live.ComboSend
-	(*UserInfo)(nil),      // 8: live.UserInfo
-	(*SuperChatMsg)(nil),  // 9: live.SuperChatMsg
+	(*Empty)(nil),              // 0: live.Empty
+	(*LiveEvent)(nil),          // 1: live.LiveEvent
+	(*DanmuMsg)(nil),           // 2: live.DanmuMsg
+	(*PopularityMsg)(nil),      // 3: live.PopularityMsg
+	(*GiftData)(nil),           // 4: live.GiftData
+	(*GiftInfo)(nil),           // 5: live.GiftInfo
+	(*MedalInfo)(nil),          // 6: live.MedalInfo
+	(*ComboSend)(nil),          // 7: live.ComboSend
+	(*UserInfo)(nil),           // 8: live.UserInfo
+	(*SuperChatMsg)(nil),       // 9: live.SuperChatMsg
+	(*InteractMsg)(nil),        // 10: live.InteractMsg
+	(*InteractData102)(nil),    // 11: live.InteractData102
+	(*InteractCombo)(nil),      // 12: live.InteractCombo
+	(*InteractDataNotice)(nil), // 13: live.InteractDataNotice
 }
 var file_api_grpc_pb_live_proto_depIdxs = []int32{
 	2,  // 0: live.LiveEvent.danmu:type_name -> live.DanmuMsg
 	3,  // 1: live.LiveEvent.popularity:type_name -> live.PopularityMsg
 	4,  // 2: live.LiveEvent.gift:type_name -> live.GiftData
 	9,  // 3: live.LiveEvent.super_chat:type_name -> live.SuperChatMsg
-	5,  // 4: live.GiftData.gift_info:type_name -> live.GiftInfo
-	6,  // 5: live.GiftData.medal_info:type_name -> live.MedalInfo
-	7,  // 6: live.GiftData.combo_send:type_name -> live.ComboSend
-	6,  // 7: live.SuperChatMsg.medal_info:type_name -> live.MedalInfo
-	8,  // 8: live.SuperChatMsg.user_info:type_name -> live.UserInfo
-	0,  // 9: live.LiveService.Subscribe:input_type -> live.Empty
-	1,  // 10: live.LiveService.Subscribe:output_type -> live.LiveEvent
-	10, // [10:11] is the sub-list for method output_type
-	9,  // [9:10] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	10, // 4: live.LiveEvent.interaction:type_name -> live.InteractMsg
+	5,  // 5: live.GiftData.gift_info:type_name -> live.GiftInfo
+	6,  // 6: live.GiftData.medal_info:type_name -> live.MedalInfo
+	7,  // 7: live.GiftData.combo_send:type_name -> live.ComboSend
+	6,  // 8: live.SuperChatMsg.medal_info:type_name -> live.MedalInfo
+	8,  // 9: live.SuperChatMsg.user_info:type_name -> live.UserInfo
+	12, // 10: live.InteractData102.combo:type_name -> live.InteractCombo
+	0,  // 11: live.LiveService.Subscribe:input_type -> live.Empty
+	1,  // 12: live.LiveService.Subscribe:output_type -> live.LiveEvent
+	12, // [12:13] is the sub-list for method output_type
+	11, // [11:12] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_api_grpc_pb_live_proto_init() }
@@ -894,6 +1183,7 @@ func file_api_grpc_pb_live_proto_init() {
 		(*LiveEvent_SysMsg)(nil),
 		(*LiveEvent_Error)(nil),
 		(*LiveEvent_SuperChat)(nil),
+		(*LiveEvent_Interaction)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -901,7 +1191,7 @@ func file_api_grpc_pb_live_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_grpc_pb_live_proto_rawDesc), len(file_api_grpc_pb_live_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
