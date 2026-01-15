@@ -102,6 +102,22 @@ func (w *WailsUI) AppendSuperChat(superchat *live.SuperChatMsgData) {
 	w.emitter(w.ctx, live.SuperChatEvent, superchat)
 }
 
+func (w *WailsUI) AppendInteraction(interaction *live.InteractMsg) {
+	if w.ctx == nil {
+		return
+	}
+
+	w.emitter(w.ctx, live.InteractionEvent, interaction)
+}
+
+func (w *WailsUI) UpdatePopularity(popularity int) {
+	if w.ctx == nil {
+		return
+	}
+
+	w.emitter(w.ctx, live.PopularityEvent, popularity)
+}
+
 func (w *WailsUI) AppendError(err error) {
 	if w.ctx == nil {
 		return

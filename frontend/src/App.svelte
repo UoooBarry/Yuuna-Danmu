@@ -4,15 +4,18 @@
   import { SaveConfig, LoadConfig } from "../wailsjs/go/ui/WailsUI";
   import ToastNotification from "./lib/components/ToastNotification.svelte";
   import SuperChatCard from "./lib/components/SuperChatCard.svelte";
+  import type { AppConfig, DanmuItem, SuperChatMsg, ServerSettings, DanmuMsg, GiftMsg } from "./lib/types";
 
-  let danmuList = [];
-  let scList = [];
+  let danmuList: DanmuItem[] = [];
+  let scList: SuperChatMsg[] = [];
   let container: HTMLElement;
   let showControls = false;
   let showSettings = false;
   let roomID = 50819;
   let cookie = "";
-  let servers: any[] = [];
+  let servers: ServerSettings[] = [];
+  let popularity = 0;
+  let refreshToken = "";
 
   const scrollToBottom = async () => {
     if (container) {
@@ -23,31 +26,38 @@
 
   onMount(() => {
     LoadConfig().then(
-      (config: { room_id: number; cookie: string; servers: any[] }) => {
-        roomID = Number(config.room_id);
-        cookie = config.cookie;
-        servers = config.servers || [];
+      (config: any) => {
+        const appConfig = config as AppConfig;
+        roomID = Number(appConfig.room_id);
+        cookie = appConfig.cookie;
+        servers = appConfig.servers || [];
+        refreshToken = appConfig.refresh_token;
         EventsEmit("SYS_MSG", "loaded config");
       },
     );
 
-    EventsOn("DANMU_MSG", (data) => {
-      danmuList = [...danmuList, { ...data, type: "danmu" }];
+    EventsOn("POPULARITY", (pop: number) => {
+      popularity = pop;
+    });
+
+    EventsOn("DANMU_MSG", (data: any) => {
+      const msg: DanmuMsg = { ...data, type: "danmu" };
+      danmuList = [...danmuList, msg];
       if (danmuList.length > 100) danmuList = danmuList.slice(1);
       scrollToBottom();
     });
 
-    EventsOn("SEND_GIFT", (data) => {
-      const currentComboId = data.combo_send.combo_id;
+    EventsOn("SEND_GIFT", (data: any) => {
+      const currentComboId = data.combo_send?.combo_id;
 
       const existingIndex = danmuList.findIndex(
         (item) => item.type === "gift" && item.combo_id === currentComboId,
       );
 
-      let updatedGift: any;
+      let updatedGift: GiftMsg;
 
       if (currentComboId && existingIndex !== -1) {
-        const oldGift = danmuList[existingIndex];
+        const oldGift = danmuList[existingIndex] as GiftMsg;
 
         updatedGift = {
           ...data,
@@ -72,8 +82,55 @@
       scrollToBottom();
     });
 
-    EventsOn("SUPER_CHAT_MESSAGE", (data) => {
+    EventsOn("SUPER_CHAT_MESSAGE", (data: SuperChatMsg) => {
       scList = [...scList, data];
+    });
+
+    EventsOn("DM_INTERACTION", (evt: any) => {
+      let contentData = evt.data;
+      if (typeof contentData === "string") {
+        try {
+          contentData = JSON.parse(contentData);
+        } catch (e) {
+          console.error("Failed to parse DM_INTERACTION data", e);
+          return;
+        }
+      }
+
+      if (evt.type === 102) {
+        if (contentData.combo) {
+          contentData.combo.forEach((c: any) => {
+            let nick = c.guide || "Combo";
+            if (nick.endsWith(":")) nick = nick.slice(0, -1);
+            if (nick.endsWith("：")) nick = nick.slice(0, -1);
+
+            const msg: DanmuMsg = {
+              type: "danmu",
+              nickname: nick,
+              content: `${c.content} x${c.cnt}`,
+            };
+
+            danmuList = [
+              ...danmuList,
+              msg,
+            ];
+          });
+        }
+      } else if ([103, 104, 105, 106].includes(evt.type)) {
+        let msgStr = `${contentData.cnt} ${contentData.suffix_text}`;
+        const msg: DanmuMsg = {
+          type: "danmu",
+          nickname: "",
+          content: msgStr,
+        };
+        danmuList = [
+          ...danmuList,
+          msg,
+        ];
+      }
+      
+      if (danmuList.length > 100) danmuList = danmuList.slice(danmuList.length - 100);
+      scrollToBottom();
     });
   });
 
@@ -82,7 +139,8 @@
   }
 
   async function handleSave() {
-    await SaveConfig({ room_id: Number(roomID), cookie: cookie, servers: servers });
+    const config: AppConfig = { room_id: Number(roomID), cookie: cookie, servers: servers, refresh_token: refreshToken };
+    await SaveConfig(config);
     danmuList = [];
     showSettings = false;
   }
@@ -104,7 +162,12 @@
   on:mouseleave={() => (showControls = false)}
 >
   <header class="drag-bar">
-    <span class="title">Yuuna Danmu</span>
+    <div class="header-left">
+      <span class="title">Yuuna Danmu</span>
+      {#if popularity > 0}
+        <span class="popularity">🔥 {popularity}</span>
+      {/if}
+    </div>
 
     <div class="controls" class:visible={showControls}>
       <div class="controls" class:visible={showControls}>
@@ -152,6 +215,14 @@
             placeholder="Cookie"
             rows="5"
           ></textarea>
+        </div>
+        <div class="field">
+          <label for="refresh-token">Refresh Token(ac_time_value)</label>
+          <input
+            bind:value={refreshToken}
+            id="refresh-token"
+            placeholder="输入Refresh Token可自动刷新Cookie"
+          />
         </div>
 
         <div class="servers-section">
@@ -239,10 +310,10 @@
 
                 <div class="gift-details">
                   <span class="gift-name">{d.gift_name}</span>
-                  <span class="gift-count">x {d.combo_send.combo_num}</span>
+                  <span class="gift-count">x {d.combo_send?.combo_num}</span>
                 </div>
 
-                {#if d.coin_type === "gold"}
+                {#if d.coin_type === "gold" && d.combo_total_coin}
                   <div class="coin-badge">
                     ¥{(d.combo_total_coin / 1000).toFixed(1)}
                   </div>
@@ -390,6 +461,18 @@
     padding: 0 8px;
     --wails-draggable: drag;
     background: rgba(31, 29, 46, 0.4);
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .popularity {
+    font-size: 10px;
+    color: var(--love);
+    font-weight: 600;
   }
 
   .controls {

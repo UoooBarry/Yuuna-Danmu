@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"math/rand"
 	"time"
 
@@ -17,6 +18,9 @@ func startMockDriver(ctx context.Context, ch chan live.Event) {
 
 	superChatTicker := time.NewTicker(30 * time.Second)
 	defer superChatTicker.Stop()
+
+	interactTicker := time.NewTicker(10 * time.Second)
+	defer interactTicker.Stop()
 
 	mockModel := &live.MedalInfo{
 		MedalName:  "开发者",
@@ -81,6 +85,48 @@ func startMockDriver(ctx context.Context, ch chan live.Event) {
 			ch <- live.Event{
 				Type: live.SuperChatEvent,
 				Data: mockSuperChat,
+			}
+		case <-interactTicker.C:
+			if rand.Intn(2) == 0 {
+				data := live.InteractData102{
+					Combo: []live.InteractCombo{
+						{
+							Content: "666666",
+							Cnt:     rand.Intn(10) + 1,
+							Guide:   "他们都在说:",
+						},
+					},
+				}
+				dataBytes, _ := json.Marshal(data)
+				ch <- live.Event{
+					Type: live.InteractionEvent,
+					Data: &live.InteractMsg{
+						Type: 102,
+						Data: dataBytes,
+					},
+				}
+			} else {
+				types := []int{103, 106}
+				selectedType := types[rand.Intn(len(types))]
+				suffix := "人关注了主播"
+				if selectedType == 106 {
+					suffix = "人正在点赞"
+				}
+
+				noticeData := live.InteractDataNotice{
+					Cnt:        rand.Intn(100) + 1,
+					SuffixText: suffix,
+				}
+				noticeBytes, _ := json.Marshal(noticeData)
+				noticeStr, _ := json.Marshal(string(noticeBytes))
+
+				ch <- live.Event{
+					Type: live.InteractionEvent,
+					Data: &live.InteractMsg{
+						Type: selectedType,
+						Data: noticeStr,
+					},
+				}
 			}
 		}
 	}

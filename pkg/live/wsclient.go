@@ -74,12 +74,11 @@ func (c *WsClient) sendAuth() error {
 	payload := AuthPayload{
 		UID:      c.authContext.UID,
 		RoomID:   c.RoomID,
-		ProtoVer: 3, // compress level 3
+		ProtoVer: ProtoBrotli,
 		Type:     2,
 		Key:      c.Token,
 		Buvid:    buvid,
 	}
-	log.Println(payload)
 
 	body, _ := json.Marshal(payload)
 	return c.Conn.WriteMessage(websocket.BinaryMessage, Pack(OpAuth, body))

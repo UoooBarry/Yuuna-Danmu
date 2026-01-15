@@ -68,6 +68,7 @@ API 参考主要来自 [哔哩哔哩-API-收集整理](https://github.com/Social
 - [X] 礼物显示（含连击、图标）
 - [X] WebSocket 自动重连
 - [X] gRPC 服务支持
+- [X] Cookie 自动刷新
 
 ### 计划中
 

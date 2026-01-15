@@ -7,10 +7,11 @@ import (
 )
 
 type AppConfig struct {
-	RoomID  int              `json:"room_id"`
-	Cookie  string           `json:"cookie"`
-	Debug   bool             `json:"debug"`
-	Servers []ServerSettings `json:"servers"`
+	RoomID       int              `json:"room_id"`
+	Cookie       string           `json:"cookie"`
+	RefreshToken string           `json:"refresh_token"`
+	Debug        bool             `json:"debug"`
+	Servers      []ServerSettings `json:"servers"`
 }
 
 type ServerSettings struct {
@@ -27,6 +28,7 @@ var defaultConfig = &AppConfig{
 	Servers: []ServerSettings{
 		{Name: "gRPC", Type: "grpc", Port: 50051, Enabled: false},
 	},
+	RefreshToken: "",
 }
 
 type ServerType string
