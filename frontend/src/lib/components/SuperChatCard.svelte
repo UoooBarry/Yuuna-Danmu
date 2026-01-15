@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
+  import type { SuperChatMsg } from "../types";
 
-  export let data: any;
+  export let data: SuperChatMsg;
   export let getProxyUrl: (url: string) => string;
   export let onFinished: (startTime: number) => void;
 

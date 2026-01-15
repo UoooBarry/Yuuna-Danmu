@@ -43,7 +43,7 @@ func Pack(op uint32, payload []byte) []byte {
 	header := Header{
 		PacketLen: uint32(HeaderLength + len(payload)),
 		HeaderLen: uint16(HeaderLength),
-		ProtoVer:  1,
+		ProtoVer:  ProtoInt,
 		Operation: op,
 		Sequence:  1,
 	}

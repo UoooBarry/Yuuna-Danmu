@@ -1,7 +1,6 @@
 package live
 
 import (
-	"encoding/binary"
 	"encoding/json"
 	"log"
 	"time"
@@ -10,14 +9,7 @@ import (
 func (c *WsClient) routeOperation(header *Header, body []byte) {
 	switch header.Operation {
 	case OpHeartbeatReply:
-		if len(body) >= 4 {
-			popularity := binary.BigEndian.Uint32(body[:4])
-			c.eventCh <- Event{
-				Type:      PopularityEvent,
-				Data:      PopularityMsg{Popularity: int(popularity)},
-				Timestamp: time.Now().UnixNano(),
-			}
-		}
+		// Heartbeat Reply no longer contains popularity data
 
 	case OpSendMsgReply:
 		c.dispatch(body)
@@ -62,9 +54,27 @@ func (c *WsClient) dispatch(body []byte) {
 			Data:      data,
 			Timestamp: time.Now().UnixNano(),
 		}
+	case InteractionEvent:
+		data := c.parseInteraction(body)
+		log.Println(data)
+		c.eventCh <- Event{
+			Type:      InteractionEvent,
+			Data:      data,
+			Timestamp: time.Now().UnixNano(),
+		}
 	case "INTERACT_WORD":
 	default:
 	}
+}
+
+func (c *WsClient) parseInteraction(body []byte) *InteractMsg {
+	var raw struct {
+		Data InteractMsg `json:"data"`
+	}
+	if err := json.Unmarshal(body, &raw); err != nil {
+		return nil
+	}
+	return &raw.Data
 }
 
 func (c *WsClient) parseDanmu(body []byte) *DanmuMsg {

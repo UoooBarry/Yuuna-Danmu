@@ -23,11 +23,11 @@ func (s *GRPCServer) mapToProto(event any) *pb.LiveEvent {
 			},
 		}
 
-	case int:
+	case *live.PopularityMsg:
 		return &pb.LiveEvent{
 			Payload: &pb.LiveEvent_Popularity{
 				Popularity: &pb.PopularityMsg{
-					Popularity: int32(e),
+					Popularity: int32(e.Popularity),
 				},
 			},
 		}

@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -64,4 +65,34 @@ func (t *TerminalUI) SetOnConfigChange(onConfigChange OnConfigChange) {
 
 func (t *TerminalUI) AppendSuperChat(superchat *live.SuperChatMsgData) {
 	fmt.Printf("[%s] [超级弹幕] %s: %s\n", time.Now().Format(time.TimeOnly), superchat.UserInfo.UName, superchat.Message)
+}
+
+func (t *TerminalUI) AppendInteraction(interaction *live.InteractMsg) {
+	switch interaction.Type {
+	case 102: // Combo Danmu
+		var data live.InteractData102
+		if err := json.Unmarshal(interaction.Data, &data); err == nil {
+			for _, combo := range data.Combo {
+				fmt.Printf("[%s] [弹幕合并] %s x%d: %s\n", time.Now().Format(time.TimeOnly), combo.Guide, combo.Cnt, combo.Content)
+			}
+		}
+	case 103, 104, 105, 106: // Notice
+		var jsonStr string
+		if err := json.Unmarshal(interaction.Data, &jsonStr); err == nil {
+			var data live.InteractDataNotice
+			if err := json.Unmarshal([]byte(jsonStr), &data); err == nil {
+				msg := fmt.Sprintf("%d %s", data.Cnt, data.SuffixText)
+				if interaction.Type == 104 { // Gift
+					msg += fmt.Sprintf(" (GiftID: %d)", data.GiftID)
+				}
+				fmt.Printf("[%s] [交互] %s\n", time.Now().Format(time.TimeOnly), msg)
+			}
+		}
+	case 101:
+		fmt.Printf("[%s] [交互] 投票活动\n", time.Now().Format(time.TimeOnly))
+	}
+}
+
+func (t *TerminalUI) UpdatePopularity(popularity int) {
+	fmt.Printf("[%s] [人气] %d\n", time.Now().Format(time.TimeOnly), popularity)
 }

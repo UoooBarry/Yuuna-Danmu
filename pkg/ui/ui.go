@@ -14,10 +14,13 @@ type UI interface {
 	Stop() error
 	SetOnConfigChange(onConfigChange OnConfigChange)
 	AppendSuperChat(superchat *live.SuperChatMsgData)
+	AppendInteraction(interaction *live.InteractMsg)
+	UpdatePopularity(popularity int)
 }
 
 type ConfigPayload struct {
-	RoomID  int                     `json:"room_id"`
-	Cookie  string                  `json:"cookie"`
-	Servers []config.ServerSettings `json:"servers"`
+	RoomID       int                     `json:"room_id"`
+	Cookie       string                  `json:"cookie"`
+	Servers      []config.ServerSettings `json:"servers"`
+	RefreshToken string                  `json:"refresh_token"`
 }

@@ -3,9 +3,11 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 
+	"uooobarry/yuuna-danmu/pkg/bilibili"
 	"uooobarry/yuuna-danmu/pkg/config"
 	"uooobarry/yuuna-danmu/pkg/live"
 	"uooobarry/yuuna-danmu/pkg/server"
@@ -80,6 +82,8 @@ func NewApp(opts ...Option) (*App, error) {
 
 func (app *App) Run() error {
 	go app.consumeEvents()
+
+	app.checkCookie()
 
 	app.initServers()
 
@@ -168,6 +172,38 @@ func (app *App) handleEvent(event live.Event) {
 	case live.SuperChatEvent:
 		if sc, ok := event.Data.(*live.SuperChatMsgData); ok {
 			app.ui.AppendSuperChat(sc)
+		}
+	case live.InteractionEvent:
+		if interaction, ok := event.Data.(*live.InteractMsg); ok {
+			app.ui.AppendInteraction(interaction)
+		}
+	case live.PopularityEvent:
+		if p, ok := event.Data.(*live.PopularityMsg); ok {
+			app.ui.UpdatePopularity(p.Popularity)
+		}
+	}
+}
+
+func (app *App) checkCookie() {
+	if app.AppConfig.Cookie == "" || app.AppConfig.RefreshToken == "" {
+		return
+	}
+	newCookie, newRefreshToken, err := bilibili.CheckAndRefreshCookie(app.AppConfig.RefreshToken)
+	if err != nil {
+		log.Fatalf("failed to check and refresh cookie: %v", err)
+		return
+	}
+
+	if newCookie != "" && newRefreshToken != "" {
+		app.AppConfig.Cookie = newCookie
+		app.AppConfig.RefreshToken = newRefreshToken
+		if err := app.AppConfig.Save(); err != nil {
+			app.ui.AppendError(fmt.Errorf("failed to save config: %w", err))
+		}
+		if app.session != nil {
+			if err := app.session.UpdateConfig(app.AppConfig.RoomID, app.AppConfig.Cookie); err != nil {
+				app.ui.AppendError(fmt.Errorf("failed to update session config: %w", err))
+			}
 		}
 	}
 

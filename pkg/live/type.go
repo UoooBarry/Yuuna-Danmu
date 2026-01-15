@@ -1,5 +1,7 @@
 package live
 
+import "encoding/json"
+
 type Event struct {
 	Type      string
 	Data      any
@@ -83,4 +85,30 @@ var (
 	SysMsgEvent     = "SYS_MSG"
 	ErrorEvent      = "SYS_ERROR"
 	SuperChatEvent  = "SUPER_CHAT_MESSAGE"
+	InteractionEvent = "DM_INTERACTION"
 )
+
+type InteractMsg struct {
+	ID     int64           `json:"id"`
+	Status int             `json:"status"`
+	Type   int             `json:"type"` // 101-106
+	Data   json.RawMessage `json:"data"`
+}
+
+type InteractData102 struct {
+	Combo []InteractCombo `json:"combo"`
+}
+
+type InteractCombo struct {
+	ID      int64  `json:"id"`
+	Status  int    `json:"status"`
+	Content string `json:"content"`
+	Cnt     int    `json:"cnt"`
+	Guide   string `json:"guide"`
+}
+
+type InteractDataNotice struct {
+	Cnt        int    `json:"cnt"`
+	SuffixText string `json:"suffix_text"`
+	GiftID     int    `json:"gift_id"`
+}
