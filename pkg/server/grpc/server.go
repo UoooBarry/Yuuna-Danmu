@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"uooobarry/yuuna-danmu/api/grpc/pb"
+	"uooobarry/yuuna-danmu/pkg/live"
 
 	"google.golang.org/grpc"
 )
@@ -75,7 +76,7 @@ func (s *GRPCServer) Subscribe(_ *pb.Empty, stream pb.LiveService_SubscribeServe
 	}
 }
 
-func (s *GRPCServer) Dispatch(event any) {
+func (s *GRPCServer) Dispatch(event live.Event) {
 	pbEvent := s.mapToProto(event)
 	if pbEvent == nil {
 		return

@@ -146,7 +146,7 @@ func (app *App) consumeEvents() {
 		app.handleEvent(event)
 
 		for _, s := range app.servers {
-			s.Target.Dispatch(event.Data)
+			s.Target.Dispatch(event)
 		}
 	}
 }

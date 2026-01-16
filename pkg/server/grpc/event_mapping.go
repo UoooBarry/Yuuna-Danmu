@@ -7,10 +7,15 @@ import (
 	"uooobarry/yuuna-danmu/pkg/live"
 )
 
-func (s *GRPCServer) mapToProto(event any) *pb.LiveEvent {
-	switch e := event.(type) {
+func (s *GRPCServer) mapToProto(event live.Event) *pb.LiveEvent {
+	switch event.Type {
 
-	case *live.DanmuMsg:
+	case live.DanmuEvent:
+		e, ok := event.Data.(*live.DanmuMsg)
+		if !ok {
+			return nil
+		}
+
 		return &pb.LiveEvent{
 			Payload: &pb.LiveEvent_Danmu{
 				Danmu: &pb.DanmuMsg{
@@ -23,7 +28,12 @@ func (s *GRPCServer) mapToProto(event any) *pb.LiveEvent {
 			},
 		}
 
-	case *live.PopularityMsg:
+	case live.PopularityEvent:
+		e, ok := event.Data.(*live.PopularityMsg)
+		if !ok {
+			return nil
+		}
+
 		return &pb.LiveEvent{
 			Payload: &pb.LiveEvent_Popularity{
 				Popularity: &pb.PopularityMsg{
@@ -32,7 +42,12 @@ func (s *GRPCServer) mapToProto(event any) *pb.LiveEvent {
 			},
 		}
 
-	case *live.GiftData:
+	case live.GiftEvent:
+		e, ok := event.Data.(*live.GiftData)
+		if !ok {
+			return nil
+		}
+
 		return &pb.LiveEvent{
 			Payload: &pb.LiveEvent_Gift{
 				Gift: &pb.GiftData{
@@ -62,7 +77,12 @@ func (s *GRPCServer) mapToProto(event any) *pb.LiveEvent {
 			},
 		}
 
-	case *live.SuperChatMsgData:
+	case live.SuperChatEvent:
+		e, ok := event.Data.(*live.SuperChatMsgData)
+		if !ok {
+			return nil
+		}
+
 		return &pb.LiveEvent{
 			Payload: &pb.LiveEvent_SuperChat{
 				SuperChat: &pb.SuperChatMsg{
@@ -83,8 +103,12 @@ func (s *GRPCServer) mapToProto(event any) *pb.LiveEvent {
 			},
 		}
 
-	case *live.InteractMsg:
-		log.Println("InteractMsg", string(e.Data))
+	case live.InteractionEvent:
+		e, ok := event.Data.(*live.InteractMsg)
+		if !ok {
+			return nil
+		}
+
 		return &pb.LiveEvent{
 			Payload: &pb.LiveEvent_Interaction{
 				Interaction: &pb.InteractMsg{
@@ -96,10 +120,27 @@ func (s *GRPCServer) mapToProto(event any) *pb.LiveEvent {
 			},
 		}
 
-	case string:
+	case live.SysMsgEvent:
+		e, ok := event.Data.(string)
+		if !ok {
+			return nil
+		}
+
 		return &pb.LiveEvent{
 			Payload: &pb.LiveEvent_SysMsg{
 				SysMsg: e,
+			},
+		}
+
+	case live.ErrorEvent:
+		e, ok := event.Data.(string)
+		if !ok {
+			return nil
+		}
+
+		return &pb.LiveEvent{
+			Payload: &pb.LiveEvent_Error{
+				Error: e,
 			},
 		}
 
