@@ -23,4 +23,5 @@ type ConfigPayload struct {
 	Cookie       string                  `json:"cookie"`
 	Servers      []config.ServerSettings `json:"servers"`
 	RefreshToken string                  `json:"refresh_token"`
+	Transparent  bool                    `json:"transparent"`
 }

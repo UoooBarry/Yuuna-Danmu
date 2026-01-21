@@ -4,7 +4,14 @@
   import { SaveConfig, LoadConfig } from "../wailsjs/go/ui/WailsUI";
   import ToastNotification from "./lib/components/ToastNotification.svelte";
   import SuperChatCard from "./lib/components/SuperChatCard.svelte";
-  import type { AppConfig, DanmuItem, SuperChatMsg, ServerSettings, DanmuMsg, GiftMsg } from "./lib/types";
+  import type {
+    AppConfig,
+    DanmuItem,
+    SuperChatMsg,
+    ServerSettings,
+    DanmuMsg,
+    GiftMsg,
+  } from "./lib/types";
 
   let danmuList: DanmuItem[] = [];
   let scList: SuperChatMsg[] = [];
@@ -16,6 +23,7 @@
   let servers: ServerSettings[] = [];
   let popularity = 0;
   let refreshToken = "";
+  let transparent = false;
 
   const scrollToBottom = async () => {
     if (container) {
@@ -25,16 +33,14 @@
   };
 
   onMount(() => {
-    LoadConfig().then(
-      (config: any) => {
-        const appConfig = config as AppConfig;
-        roomID = Number(appConfig.room_id);
-        cookie = appConfig.cookie;
-        servers = appConfig.servers || [];
-        refreshToken = appConfig.refresh_token;
-        EventsEmit("SYS_MSG", "loaded config");
-      },
-    );
+    LoadConfig().then((config: any) => {
+      const appConfig = config as AppConfig;
+      roomID = Number(appConfig.room_id);
+      cookie = appConfig.cookie;
+      servers = appConfig.servers || [];
+      refreshToken = appConfig.refresh_token;
+      transparent = appConfig.transparent;
+    });
 
     EventsOn("POPULARITY", (pop: number) => {
       popularity = pop;
@@ -110,10 +116,7 @@
               content: `${c.content} x${c.cnt}`,
             };
 
-            danmuList = [
-              ...danmuList,
-              msg,
-            ];
+            danmuList = [...danmuList, msg];
           });
         }
       } else if ([103, 104, 105, 106].includes(evt.type)) {
@@ -123,13 +126,11 @@
           nickname: "",
           content: msgStr,
         };
-        danmuList = [
-          ...danmuList,
-          msg,
-        ];
+        danmuList = [...danmuList, msg];
       }
-      
-      if (danmuList.length > 100) danmuList = danmuList.slice(danmuList.length - 100);
+
+      if (danmuList.length > 100)
+        danmuList = danmuList.slice(danmuList.length - 100);
       scrollToBottom();
     });
   });
@@ -139,7 +140,13 @@
   }
 
   async function handleSave() {
-    const config: AppConfig = { room_id: Number(roomID), cookie: cookie, servers: servers, refresh_token: refreshToken };
+    const config: AppConfig = {
+      room_id: Number(roomID),
+      cookie: cookie,
+      servers: servers,
+      refresh_token: refreshToken,
+      transparent,
+    };
     await SaveConfig(config);
     danmuList = [];
     showSettings = false;
@@ -158,6 +165,7 @@
 
 <main
   class="app-container"
+  class:is-transparent={transparent}
   on:mouseenter={() => (showControls = true)}
   on:mouseleave={() => (showControls = false)}
 >
@@ -198,6 +206,15 @@
   <div class="content-area">
     {#if showSettings}
       <div class="settings-panel">
+        <div class="field">
+        <label class="server-row" style="cursor: pointer;">
+          <span>透明模式</span>
+          <label class="switch">
+            <input type="checkbox" bind:checked={transparent} />
+            <span class="slider"></span>
+          </label>
+        </label>
+      </div>
         <div class="field">
           <label for="room-id">Room ID</label>
           <input
@@ -274,7 +291,9 @@
                   <span class="m-level">{d.medalLevel}</span>
                 </span>
               {/if}
-              <span class="nickname">{d.nickname}:</span>
+              {#if d.nickname}
+                <span class="nickname">{d.nickname}:</span>
+              {/if}
               <span class="content">{d.content}</span>
             </div>
           {:else if d.type === "gift"}
@@ -800,4 +819,19 @@
   input:checked + .slider:before {
     transform: translateX(14px);
   }
+
+  /* When transparent is true */
+  .app-container.is-transparent {
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Optional: Make the header bar also transparent when in transparent mode */
+  .app-container.is-transparent .drag-bar {
+    background: transparent !important;
+    border-bottom: none !important;
+  }
 </style>
+

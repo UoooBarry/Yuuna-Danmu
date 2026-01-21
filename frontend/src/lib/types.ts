@@ -10,6 +10,7 @@ export interface AppConfig {
     cookie: string;
     refresh_token: string;
     servers: ServerSettings[];
+    transparent: boolean;
 }
 
 export interface DanmuMsg {

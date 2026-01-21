@@ -12,6 +12,7 @@ type AppConfig struct {
 	RefreshToken string           `json:"refresh_token"`
 	Debug        bool             `json:"debug"`
 	Servers      []ServerSettings `json:"servers"`
+	Transparent  bool             `json:"transparent"`
 }
 
 type ServerSettings struct {
@@ -29,6 +30,7 @@ var defaultConfig = &AppConfig{
 		{Name: "gRPC", Type: "grpc", Port: 50051, Enabled: false},
 	},
 	RefreshToken: "",
+	Transparent:  true,
 }
 
 type ServerType string
