@@ -1,7 +1,0 @@
-	var raw struct {
-		Data GiftStarProcessData `json:"data"`
-	}
-	if err := json.Unmarshal(body, &raw); err != nil {
-		return nil
-	}
-	return &raw.Data

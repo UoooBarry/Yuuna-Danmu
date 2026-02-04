@@ -1,6 +1,0 @@
-type OnlineRankCountData struct {
-	Count             int    `json:"count"`
-	CountText         string `json:"count_text"`
-	OnlineCount       int    `json:"online_count"`
-	OnlineCountText   string `json:"online_count_text"`
-}

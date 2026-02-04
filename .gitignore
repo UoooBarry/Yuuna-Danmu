@@ -19,3 +19,6 @@ yarn-error.log*
 log/*.log
 
 doc/message_stream.md
+
+DS_Store
+tmp/99-*
