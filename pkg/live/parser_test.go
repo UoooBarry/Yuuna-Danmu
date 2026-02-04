@@ -19,8 +19,7 @@ func TestParseToast(t *testing.T) {
 		}
 	}`
 
-	c := &WsClient{}
-	data := c.parseToast([]byte(jsonBody))
+	data := parseToast([]byte(jsonBody))
 
 	if data == nil {
 		t.Fatal("Expected non-nil data")
@@ -99,8 +98,7 @@ func TestParseGiftStarProcess(t *testing.T) {
 		}
 	}`
 
-	c := &WsClient{}
-	data := c.parseGiftStarProcess([]byte(jsonBody))
+	data := parseGiftStarProcess([]byte(jsonBody))
 
 	if data == nil {
 		t.Fatal("Expected non-nil data")

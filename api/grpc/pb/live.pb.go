@@ -68,6 +68,9 @@ type LiveEvent struct {
 	//	*LiveEvent_Error
 	//	*LiveEvent_SuperChat
 	//	*LiveEvent_Interaction
+	//	*LiveEvent_OnlineRankCount
+	//	*LiveEvent_Toast
+	//	*LiveEvent_GiftStarProcess
 	Payload       isLiveEvent_Payload `protobuf_oneof:"payload"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -173,6 +176,33 @@ func (x *LiveEvent) GetInteraction() *InteractMsg {
 	return nil
 }
 
+func (x *LiveEvent) GetOnlineRankCount() *OnlineRankCountMsg {
+	if x != nil {
+		if x, ok := x.Payload.(*LiveEvent_OnlineRankCount); ok {
+			return x.OnlineRankCount
+		}
+	}
+	return nil
+}
+
+func (x *LiveEvent) GetToast() *ToastMsg {
+	if x != nil {
+		if x, ok := x.Payload.(*LiveEvent_Toast); ok {
+			return x.Toast
+		}
+	}
+	return nil
+}
+
+func (x *LiveEvent) GetGiftStarProcess() *GiftStarProcessMsg {
+	if x != nil {
+		if x, ok := x.Payload.(*LiveEvent_GiftStarProcess); ok {
+			return x.GiftStarProcess
+		}
+	}
+	return nil
+}
+
 type isLiveEvent_Payload interface {
 	isLiveEvent_Payload()
 }
@@ -205,6 +235,18 @@ type LiveEvent_Interaction struct {
 	Interaction *InteractMsg `protobuf:"bytes,7,opt,name=interaction,proto3,oneof"`
 }
 
+type LiveEvent_OnlineRankCount struct {
+	OnlineRankCount *OnlineRankCountMsg `protobuf:"bytes,8,opt,name=online_rank_count,json=onlineRankCount,proto3,oneof"`
+}
+
+type LiveEvent_Toast struct {
+	Toast *ToastMsg `protobuf:"bytes,9,opt,name=toast,proto3,oneof"`
+}
+
+type LiveEvent_GiftStarProcess struct {
+	GiftStarProcess *GiftStarProcessMsg `protobuf:"bytes,10,opt,name=gift_star_process,json=giftStarProcess,proto3,oneof"`
+}
+
 func (*LiveEvent_Danmu) isLiveEvent_Payload() {}
 
 func (*LiveEvent_Popularity) isLiveEvent_Payload() {}
@@ -218,6 +260,12 @@ func (*LiveEvent_Error) isLiveEvent_Payload() {}
 func (*LiveEvent_SuperChat) isLiveEvent_Payload() {}
 
 func (*LiveEvent_Interaction) isLiveEvent_Payload() {}
+
+func (*LiveEvent_OnlineRankCount) isLiveEvent_Payload() {}
+
+func (*LiveEvent_Toast) isLiveEvent_Payload() {}
+
+func (*LiveEvent_GiftStarProcess) isLiveEvent_Payload() {}
 
 type DanmuMsg struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -847,6 +895,210 @@ func (x *InteractMsg) GetData() string {
 	return ""
 }
 
+type OnlineRankCountMsg struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Count           int32                  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
+	CountText       string                 `protobuf:"bytes,2,opt,name=count_text,json=countText,proto3" json:"count_text,omitempty"`
+	OnlineCount     int32                  `protobuf:"varint,3,opt,name=online_count,json=onlineCount,proto3" json:"online_count,omitempty"`
+	OnlineCountText string                 `protobuf:"bytes,4,opt,name=online_count_text,json=onlineCountText,proto3" json:"online_count_text,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *OnlineRankCountMsg) Reset() {
+	*x = OnlineRankCountMsg{}
+	mi := &file_api_grpc_pb_live_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OnlineRankCountMsg) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OnlineRankCountMsg) ProtoMessage() {}
+
+func (x *OnlineRankCountMsg) ProtoReflect() protoreflect.Message {
+	mi := &file_api_grpc_pb_live_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OnlineRankCountMsg.ProtoReflect.Descriptor instead.
+func (*OnlineRankCountMsg) Descriptor() ([]byte, []int) {
+	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *OnlineRankCountMsg) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+func (x *OnlineRankCountMsg) GetCountText() string {
+	if x != nil {
+		return x.CountText
+	}
+	return ""
+}
+
+func (x *OnlineRankCountMsg) GetOnlineCount() int32 {
+	if x != nil {
+		return x.OnlineCount
+	}
+	return 0
+}
+
+func (x *OnlineRankCountMsg) GetOnlineCountText() string {
+	if x != nil {
+		return x.OnlineCountText
+	}
+	return ""
+}
+
+type ToastMsg struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GuardLevel    int32                  `protobuf:"varint,1,opt,name=guard_level,json=guardLevel,proto3" json:"guard_level,omitempty"`
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Price         int32                  `protobuf:"varint,3,opt,name=price,proto3" json:"price,omitempty"`
+	Uid           int64                  `protobuf:"varint,4,opt,name=uid,proto3" json:"uid,omitempty"`
+	Num           int32                  `protobuf:"varint,5,opt,name=num,proto3" json:"num,omitempty"`
+	Unit          string                 `protobuf:"bytes,6,opt,name=unit,proto3" json:"unit,omitempty"`
+	RoleName      string                 `protobuf:"bytes,7,opt,name=role_name,json=roleName,proto3" json:"role_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ToastMsg) Reset() {
+	*x = ToastMsg{}
+	mi := &file_api_grpc_pb_live_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ToastMsg) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ToastMsg) ProtoMessage() {}
+
+func (x *ToastMsg) ProtoReflect() protoreflect.Message {
+	mi := &file_api_grpc_pb_live_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ToastMsg.ProtoReflect.Descriptor instead.
+func (*ToastMsg) Descriptor() ([]byte, []int) {
+	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ToastMsg) GetGuardLevel() int32 {
+	if x != nil {
+		return x.GuardLevel
+	}
+	return 0
+}
+
+func (x *ToastMsg) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *ToastMsg) GetPrice() int32 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+func (x *ToastMsg) GetUid() int64 {
+	if x != nil {
+		return x.Uid
+	}
+	return 0
+}
+
+func (x *ToastMsg) GetNum() int32 {
+	if x != nil {
+		return x.Num
+	}
+	return 0
+}
+
+func (x *ToastMsg) GetUnit() string {
+	if x != nil {
+		return x.Unit
+	}
+	return ""
+}
+
+func (x *ToastMsg) GetRoleName() string {
+	if x != nil {
+		return x.RoleName
+	}
+	return ""
+}
+
+type GiftStarProcessMsg struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GiftStarProcessMsg) Reset() {
+	*x = GiftStarProcessMsg{}
+	mi := &file_api_grpc_pb_live_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GiftStarProcessMsg) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GiftStarProcessMsg) ProtoMessage() {}
+
+func (x *GiftStarProcessMsg) ProtoReflect() protoreflect.Message {
+	mi := &file_api_grpc_pb_live_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GiftStarProcessMsg.ProtoReflect.Descriptor instead.
+func (*GiftStarProcessMsg) Descriptor() ([]byte, []int) {
+	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GiftStarProcessMsg) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 type InteractData102 struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Combo         []*InteractCombo       `protobuf:"bytes,1,rep,name=combo,proto3" json:"combo,omitempty"`
@@ -856,7 +1108,7 @@ type InteractData102 struct {
 
 func (x *InteractData102) Reset() {
 	*x = InteractData102{}
-	mi := &file_api_grpc_pb_live_proto_msgTypes[11]
+	mi := &file_api_grpc_pb_live_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -868,7 +1120,7 @@ func (x *InteractData102) String() string {
 func (*InteractData102) ProtoMessage() {}
 
 func (x *InteractData102) ProtoReflect() protoreflect.Message {
-	mi := &file_api_grpc_pb_live_proto_msgTypes[11]
+	mi := &file_api_grpc_pb_live_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -881,7 +1133,7 @@ func (x *InteractData102) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InteractData102.ProtoReflect.Descriptor instead.
 func (*InteractData102) Descriptor() ([]byte, []int) {
-	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{11}
+	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *InteractData102) GetCombo() []*InteractCombo {
@@ -904,7 +1156,7 @@ type InteractCombo struct {
 
 func (x *InteractCombo) Reset() {
 	*x = InteractCombo{}
-	mi := &file_api_grpc_pb_live_proto_msgTypes[12]
+	mi := &file_api_grpc_pb_live_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -916,7 +1168,7 @@ func (x *InteractCombo) String() string {
 func (*InteractCombo) ProtoMessage() {}
 
 func (x *InteractCombo) ProtoReflect() protoreflect.Message {
-	mi := &file_api_grpc_pb_live_proto_msgTypes[12]
+	mi := &file_api_grpc_pb_live_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -929,7 +1181,7 @@ func (x *InteractCombo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InteractCombo.ProtoReflect.Descriptor instead.
 func (*InteractCombo) Descriptor() ([]byte, []int) {
-	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{12}
+	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *InteractCombo) GetId() int64 {
@@ -978,7 +1230,7 @@ type InteractDataNotice struct {
 
 func (x *InteractDataNotice) Reset() {
 	*x = InteractDataNotice{}
-	mi := &file_api_grpc_pb_live_proto_msgTypes[13]
+	mi := &file_api_grpc_pb_live_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -990,7 +1242,7 @@ func (x *InteractDataNotice) String() string {
 func (*InteractDataNotice) ProtoMessage() {}
 
 func (x *InteractDataNotice) ProtoReflect() protoreflect.Message {
-	mi := &file_api_grpc_pb_live_proto_msgTypes[13]
+	mi := &file_api_grpc_pb_live_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1003,7 +1255,7 @@ func (x *InteractDataNotice) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InteractDataNotice.ProtoReflect.Descriptor instead.
 func (*InteractDataNotice) Descriptor() ([]byte, []int) {
-	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{13}
+	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *InteractDataNotice) GetCnt() int32 {
@@ -1032,7 +1284,7 @@ var File_api_grpc_pb_live_proto protoreflect.FileDescriptor
 const file_api_grpc_pb_live_proto_rawDesc = "" +
 	"\n" +
 	"\x16api/grpc/pb/live.proto\x12\x04live\"\a\n" +
-	"\x05Empty\"\xba\x02\n" +
+	"\x05Empty\"\xf2\x03\n" +
 	"\tLiveEvent\x12&\n" +
 	"\x05danmu\x18\x01 \x01(\v2\x0e.live.DanmuMsgH\x00R\x05danmu\x125\n" +
 	"\n" +
@@ -1043,7 +1295,11 @@ const file_api_grpc_pb_live_proto_rawDesc = "" +
 	"\x05error\x18\x05 \x01(\tH\x00R\x05error\x123\n" +
 	"\n" +
 	"super_chat\x18\x06 \x01(\v2\x12.live.SuperChatMsgH\x00R\tsuperChat\x125\n" +
-	"\vinteraction\x18\a \x01(\v2\x11.live.InteractMsgH\x00R\vinteractionB\t\n" +
+	"\vinteraction\x18\a \x01(\v2\x11.live.InteractMsgH\x00R\vinteraction\x12F\n" +
+	"\x11online_rank_count\x18\b \x01(\v2\x18.live.OnlineRankCountMsgH\x00R\x0fonlineRankCount\x12&\n" +
+	"\x05toast\x18\t \x01(\v2\x0e.live.ToastMsgH\x00R\x05toast\x12F\n" +
+	"\x11gift_star_process\x18\n" +
+	" \x01(\v2\x18.live.GiftStarProcessMsgH\x00R\x0fgiftStarProcessB\t\n" +
 	"\apayload\"\x99\x01\n" +
 	"\bDanmuMsg\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\tR\acontent\x12\x17\n" +
@@ -1104,7 +1360,24 @@ const file_api_grpc_pb_live_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\x05R\x06status\x12\x12\n" +
 	"\x04type\x18\x03 \x01(\x05R\x04type\x12\x12\n" +
-	"\x04data\x18\x04 \x01(\tR\x04data\"<\n" +
+	"\x04data\x18\x04 \x01(\tR\x04data\"\x98\x01\n" +
+	"\x12OnlineRankCountMsg\x12\x14\n" +
+	"\x05count\x18\x01 \x01(\x05R\x05count\x12\x1d\n" +
+	"\n" +
+	"count_text\x18\x02 \x01(\tR\tcountText\x12!\n" +
+	"\fonline_count\x18\x03 \x01(\x05R\vonlineCount\x12*\n" +
+	"\x11online_count_text\x18\x04 \x01(\tR\x0fonlineCountText\"\xb2\x01\n" +
+	"\bToastMsg\x12\x1f\n" +
+	"\vguard_level\x18\x01 \x01(\x05R\n" +
+	"guardLevel\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
+	"\x05price\x18\x03 \x01(\x05R\x05price\x12\x10\n" +
+	"\x03uid\x18\x04 \x01(\x03R\x03uid\x12\x10\n" +
+	"\x03num\x18\x05 \x01(\x05R\x03num\x12\x12\n" +
+	"\x04unit\x18\x06 \x01(\tR\x04unit\x12\x1b\n" +
+	"\trole_name\x18\a \x01(\tR\broleName\".\n" +
+	"\x12GiftStarProcessMsg\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"<\n" +
 	"\x0fInteractData102\x12)\n" +
 	"\x05combo\x18\x01 \x03(\v2\x13.live.InteractComboR\x05combo\"y\n" +
 	"\rInteractCombo\x12\x0e\n" +
@@ -1133,7 +1406,7 @@ func file_api_grpc_pb_live_proto_rawDescGZIP() []byte {
 	return file_api_grpc_pb_live_proto_rawDescData
 }
 
-var file_api_grpc_pb_live_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_api_grpc_pb_live_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_api_grpc_pb_live_proto_goTypes = []any{
 	(*Empty)(nil),              // 0: live.Empty
 	(*LiveEvent)(nil),          // 1: live.LiveEvent
@@ -1146,9 +1419,12 @@ var file_api_grpc_pb_live_proto_goTypes = []any{
 	(*UserInfo)(nil),           // 8: live.UserInfo
 	(*SuperChatMsg)(nil),       // 9: live.SuperChatMsg
 	(*InteractMsg)(nil),        // 10: live.InteractMsg
-	(*InteractData102)(nil),    // 11: live.InteractData102
-	(*InteractCombo)(nil),      // 12: live.InteractCombo
-	(*InteractDataNotice)(nil), // 13: live.InteractDataNotice
+	(*OnlineRankCountMsg)(nil), // 11: live.OnlineRankCountMsg
+	(*ToastMsg)(nil),           // 12: live.ToastMsg
+	(*GiftStarProcessMsg)(nil), // 13: live.GiftStarProcessMsg
+	(*InteractData102)(nil),    // 14: live.InteractData102
+	(*InteractCombo)(nil),      // 15: live.InteractCombo
+	(*InteractDataNotice)(nil), // 16: live.InteractDataNotice
 }
 var file_api_grpc_pb_live_proto_depIdxs = []int32{
 	2,  // 0: live.LiveEvent.danmu:type_name -> live.DanmuMsg
@@ -1156,19 +1432,22 @@ var file_api_grpc_pb_live_proto_depIdxs = []int32{
 	4,  // 2: live.LiveEvent.gift:type_name -> live.GiftData
 	9,  // 3: live.LiveEvent.super_chat:type_name -> live.SuperChatMsg
 	10, // 4: live.LiveEvent.interaction:type_name -> live.InteractMsg
-	5,  // 5: live.GiftData.gift_info:type_name -> live.GiftInfo
-	6,  // 6: live.GiftData.medal_info:type_name -> live.MedalInfo
-	7,  // 7: live.GiftData.combo_send:type_name -> live.ComboSend
-	6,  // 8: live.SuperChatMsg.medal_info:type_name -> live.MedalInfo
-	8,  // 9: live.SuperChatMsg.user_info:type_name -> live.UserInfo
-	12, // 10: live.InteractData102.combo:type_name -> live.InteractCombo
-	0,  // 11: live.LiveService.Subscribe:input_type -> live.Empty
-	1,  // 12: live.LiveService.Subscribe:output_type -> live.LiveEvent
-	12, // [12:13] is the sub-list for method output_type
-	11, // [11:12] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	11, // 5: live.LiveEvent.online_rank_count:type_name -> live.OnlineRankCountMsg
+	12, // 6: live.LiveEvent.toast:type_name -> live.ToastMsg
+	13, // 7: live.LiveEvent.gift_star_process:type_name -> live.GiftStarProcessMsg
+	5,  // 8: live.GiftData.gift_info:type_name -> live.GiftInfo
+	6,  // 9: live.GiftData.medal_info:type_name -> live.MedalInfo
+	7,  // 10: live.GiftData.combo_send:type_name -> live.ComboSend
+	6,  // 11: live.SuperChatMsg.medal_info:type_name -> live.MedalInfo
+	8,  // 12: live.SuperChatMsg.user_info:type_name -> live.UserInfo
+	15, // 13: live.InteractData102.combo:type_name -> live.InteractCombo
+	0,  // 14: live.LiveService.Subscribe:input_type -> live.Empty
+	1,  // 15: live.LiveService.Subscribe:output_type -> live.LiveEvent
+	15, // [15:16] is the sub-list for method output_type
+	14, // [14:15] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_api_grpc_pb_live_proto_init() }
@@ -1184,6 +1463,9 @@ func file_api_grpc_pb_live_proto_init() {
 		(*LiveEvent_Error)(nil),
 		(*LiveEvent_SuperChat)(nil),
 		(*LiveEvent_Interaction)(nil),
+		(*LiveEvent_OnlineRankCount)(nil),
+		(*LiveEvent_Toast)(nil),
+		(*LiveEvent_GiftStarProcess)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1191,7 +1473,7 @@ func file_api_grpc_pb_live_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_grpc_pb_live_proto_rawDesc), len(file_api_grpc_pb_live_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

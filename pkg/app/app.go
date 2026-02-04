@@ -185,6 +185,10 @@ func (app *App) handleEvent(event live.Event) {
 		if g, ok := event.Data.(*live.GiftStarProcessData); ok {
 			app.ui.AppendGiftStarProcess(g)
 		}
+	case live.OnlineRankCountEvent:
+		if od, ok := event.Data.(*live.OnlineRankCountData); ok {
+			app.ui.UpdatePopularity(od.OnlineCount)
+		}
 	}
 }
 

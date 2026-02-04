@@ -1,3 +1,17 @@
+<DIRECTIONS>
+@message_stream, implement OnlineRankCountData struct
+</DIRECTIONS>
+<Context>
+You receive a selection in neovim that you need to replace with new code.
+The selection's contents may contain notes, incorporate the notes every time if there are some.
+consider the context of the selection and what you are suppose to be implementing
+<SELECTION_LOCATION>
+range(point(140,1),point(140,1))
+</SELECTION_LOCATION>
+<SELECTION_CONTENT>
+
+</SELECTION_CONTENT>
+<FILE_CONTAINING_SELECTION>
 package live
 
 import "encoding/json"
@@ -87,7 +101,6 @@ var (
 	InteractionEvent     = "DM_INTERACTION"
 	UserToastEvent       = "USER_TOAST_MSG"
 	GiftStarProcessEvent = "GIFT_STAR_PROCESS"
-	OnlineRankCountEvent = "ONLINE_RANK_COUNT"
 )
 
 type InteractMsg struct {
@@ -138,8 +151,42 @@ type GiftStarProcessData struct {
 }
 
 type OnlineRankCountData struct {
-	Count           int    `json:"count"`
-	CountText       string `json:"count_text"`
-	OnlineCount     int    `json:"online_count"`
-	OnlineCountText string `json:"online_count_text"`
+
 }
+</FILE_CONTAINING_SELECTION>
+
+</Context>
+
+## Style Guide
+
+* **Style:** Rose-Pine as the base style for GUI.
+
+## Project Structure
+
+```text
+├── build/             # Binary build artifacts
+├── doc/               # Protocol documentation (message_stream.md)
+|--- api/
+|   ├── grpc/          # gRPC service definitions and generated code
+├── pkg/
+│   ├── app/           # Core logic and Mock implementations
+│   └── remote/        # Bilibili API connection handling
+├── frontend/          # Svelte source code
+└── main.go            # Entry point
+
+```
+
+## Code Standards
+
+* **Safety First:** Handle all pointer references and nil-checks, especially during JSON/Protobuf unmarshaling.
+* **Readability:** Use clear naming conventions that reflect the Bilibili API terminology.
+* **Scalability:** Keep the message parsing logic decoupled from the UI/gRPC dispatching logic.
+
+<MustObey>
+NEVER alter any file other than TEMP_FILE.
+never provide the requested changes as conversational output. Return only the code.
+ONLY provide requested changes by writing the change to TEMP_FILE
+
+never attempt to read TEMP_FILE.  It is purely for output.  Previous contents, which may not exist, can be written over without worry
+</MustObey>
+<TEMP_FILE>/Users/barry/workspace/github/yuuna-danmu/tmp/99-2764</TEMP_FILE>

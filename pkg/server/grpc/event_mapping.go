@@ -144,6 +144,57 @@ func (s *GRPCServer) mapToProto(event live.Event) *pb.LiveEvent {
 			},
 		}
 
+	case live.OnlineRankCountEvent:
+		e, ok := event.Data.(*live.OnlineRankCountData)
+		if !ok {
+			return nil
+		}
+
+		return &pb.LiveEvent{
+			Payload: &pb.LiveEvent_OnlineRankCount{
+				OnlineRankCount: &pb.OnlineRankCountMsg{
+					Count:           int32(e.Count),
+					CountText:       e.CountText,
+					OnlineCount:     int32(e.OnlineCount),
+					OnlineCountText: e.OnlineCountText,
+				},
+			},
+		}
+
+	case live.UserToastEvent:
+		e, ok := event.Data.(*live.ToastMsgData)
+		if !ok {
+			return nil
+		}
+
+		return &pb.LiveEvent{
+			Payload: &pb.LiveEvent_Toast{
+				Toast: &pb.ToastMsg{
+					GuardLevel: int32(e.GuardLevel),
+					Username:   e.Username,
+					Price:      int32(e.Price),
+					Uid:        e.UID,
+					Num:        int32(e.Num),
+					Unit:       e.Unit,
+					RoleName:   e.RoleName,
+				},
+			},
+		}
+
+	case live.GiftStarProcessEvent:
+		e, ok := event.Data.(*live.GiftStarProcessData)
+		if !ok {
+			return nil
+		}
+
+		return &pb.LiveEvent{
+			Payload: &pb.LiveEvent_GiftStarProcess{
+				GiftStarProcess: &pb.GiftStarProcessMsg{
+					Message: e.Message,
+				},
+			},
+		}
+
 	default:
 		log.Printf("Unknown event type: %s", event.Type)
 		return nil

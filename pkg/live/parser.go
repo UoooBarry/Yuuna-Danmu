@@ -34,45 +34,51 @@ func (c *WsClient) dispatch(body []byte) {
 
 	switch base.Cmd {
 	case DanmuEvent:
-		data := c.parseDanmu(body)
+		data := parseDanmu(body)
 		c.eventCh <- Event{
 			Type:      DanmuEvent,
 			Data:      data,
 			Timestamp: time.Now().UnixNano(),
 		}
 	case GiftEvent:
-		data := c.parseGift(body)
+		data := parseGift(body)
 		c.eventCh <- Event{
 			Type:      GiftEvent,
 			Data:      data,
 			Timestamp: time.Now().UnixNano(),
 		}
 	case SuperChatEvent:
-		data := c.parseSuperChat(body)
+		data := parseSuperChat(body)
 		c.eventCh <- Event{
 			Type:      SuperChatEvent,
 			Data:      data,
 			Timestamp: time.Now().UnixNano(),
 		}
 	case InteractionEvent:
-		data := c.parseInteraction(body)
-		log.Println(data)
+		data := parseInteraction(body)
 		c.eventCh <- Event{
 			Type:      InteractionEvent,
 			Data:      data,
 			Timestamp: time.Now().UnixNano(),
 		}
 	case UserToastEvent:
-		data := c.parseToast(body)
+		data := parseToast(body)
 		c.eventCh <- Event{
 			Type:      UserToastEvent,
 			Data:      data,
 			Timestamp: time.Now().UnixNano(),
 		}
 	case GiftStarProcessEvent:
-		data := c.parseGiftStarProcess(body)
+		data := parseGiftStarProcess(body)
 		c.eventCh <- Event{
 			Type:      GiftStarProcessEvent,
+			Data:      data,
+			Timestamp: time.Now().UnixNano(),
+		}
+	case OnlineRankCountEvent:
+		data := parseOnlineRankCount(body)
+		c.eventCh <- Event{
+			Type:      OnlineRankCountEvent,
 			Data:      data,
 			Timestamp: time.Now().UnixNano(),
 		}
@@ -80,17 +86,11 @@ func (c *WsClient) dispatch(body []byte) {
 	}
 }
 
-func (c *WsClient) parseInteraction(body []byte) *InteractMsg {
-	var raw struct {
-		Data InteractMsg `json:"data"`
-	}
-	if err := json.Unmarshal(body, &raw); err != nil {
-		return nil
-	}
-	return &raw.Data
+func parseInteraction(body []byte) *InteractMsg {
+	return parseJSONData[InteractMsg](body)
 }
 
-func (c *WsClient) parseToast(body []byte) *ToastMsgData {
+func parseToast(body []byte) *ToastMsgData {
 	var raw struct {
 		Data ToastMsgData `json:"data"`
 	}
@@ -100,7 +100,7 @@ func (c *WsClient) parseToast(body []byte) *ToastMsgData {
 	return &raw.Data
 }
 
-func (c *WsClient) parseDanmu(body []byte) *DanmuMsg {
+func parseDanmu(body []byte) *DanmuMsg {
 	var raw struct {
 		Info []interface{} `json:"info"`
 	}
@@ -134,20 +134,9 @@ func (c *WsClient) parseDanmu(body []byte) *DanmuMsg {
 	return danMu
 }
 
-func (c *WsClient) parseGift(body []byte) *GiftData {
+func parseJSONData[T any](body []byte) *T {
 	var raw struct {
-		Data GiftData `json:"data"`
-	}
-
-	if err := json.Unmarshal(body, &raw); err != nil {
-		return nil
-	}
-	return &raw.Data
-}
-
-func (c *WsClient) parseSuperChat(body []byte) *SuperChatMsgData {
-	var raw struct {
-		Data SuperChatMsgData `json:"data"`
+		Data T `json:"data"`
 	}
 	if err := json.Unmarshal(body, &raw); err != nil {
 		return nil
@@ -155,12 +144,18 @@ func (c *WsClient) parseSuperChat(body []byte) *SuperChatMsgData {
 	return &raw.Data
 }
 
-func (c *WsClient) parseGiftStarProcess(body []byte) *GiftStarProcessData {
-	var raw struct {
-		Data GiftStarProcessData `json:"data"`
-	}
-	if err := json.Unmarshal(body, &raw); err != nil {
-		return nil
-	}
-	return &raw.Data
+func parseGift(body []byte) *GiftData {
+	return parseJSONData[GiftData](body)
+}
+
+func parseSuperChat(body []byte) *SuperChatMsgData {
+	return parseJSONData[SuperChatMsgData](body)
+}
+
+func parseGiftStarProcess(body []byte) *GiftStarProcessData {
+	return parseJSONData[GiftStarProcessData](body)
+}
+
+func parseOnlineRankCount(body []byte) *OnlineRankCountData {
+	return parseJSONData[OnlineRankCountData](body)
 }

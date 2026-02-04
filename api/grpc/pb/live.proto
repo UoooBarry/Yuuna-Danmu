@@ -19,6 +19,9 @@ message LiveEvent {
     string error = 5;
     SuperChatMsg super_chat = 6;
     InteractMsg interaction = 7;
+    OnlineRankCountMsg online_rank_count = 8;
+    ToastMsg toast = 9;
+    GiftStarProcessMsg gift_star_process = 10;
   }
 }
 
@@ -85,6 +88,27 @@ message InteractMsg {
   int32 status = 2;
   int32 type = 3;
   string data = 4;
+}
+
+message OnlineRankCountMsg {
+  int32 count = 1;
+  string count_text = 2;
+  int32 online_count = 3;
+  string online_count_text = 4;
+}
+
+message ToastMsg {
+  int32 guard_level = 1;
+  string username = 2;
+  int32 price = 3;
+  int64 uid = 4;
+  int32 num = 5;
+  string unit = 6;
+  string role_name = 7;
+}
+
+message GiftStarProcessMsg {
+  string message = 1;
 }
 
 message InteractData102 {
