@@ -78,13 +78,15 @@ type UserInfo struct {
 }
 
 var (
-	DanmuEvent       = "DANMU_MSG"
-	PopularityEvent  = "POPULARITY"
-	GiftEvent        = "SEND_GIFT"
-	SysMsgEvent      = "SYS_MSG"
-	ErrorEvent       = "SYS_ERROR"
-	SuperChatEvent   = "SUPER_CHAT_MESSAGE"
-	InteractionEvent = "DM_INTERACTION"
+	DanmuEvent           = "DANMU_MSG"
+	PopularityEvent      = "POPULARITY"
+	GiftEvent            = "SEND_GIFT"
+	SysMsgEvent          = "SYS_MSG"
+	ErrorEvent           = "SYS_ERROR"
+	SuperChatEvent       = "SUPER_CHAT_MESSAGE"
+	InteractionEvent     = "DM_INTERACTION"
+	UserToastEvent       = "USER_TOAST_MSG"
+	GiftStarProcessEvent = "GIFT_STAR_PROCESS"
 )
 
 type InteractMsg struct {
@@ -110,4 +112,26 @@ type InteractDataNotice struct {
 	Cnt        int    `json:"cnt"`
 	SuffixText string `json:"suffix_text"`
 	GiftID     int    `json:"gift_id"`
+}
+
+type GuardLevel int
+
+const (
+	Governor GuardLevel = 1
+	Admiral  GuardLevel = 2
+	Captain  GuardLevel = 3
+)
+
+type ToastMsgData struct {
+	GuardLevel GuardLevel `json:"guard_level"`
+	Username   string     `json:"username"`
+	Price      int        `json:"price"`
+	UID        int64      `json:"uid"`
+	Num        int        `json:"num"`
+	Unit       string     `json:"unit"`
+	RoleName   string     `json:"role_name"`
+}
+
+type GiftStarProcessData struct {
+	Message string `json:"message"`
 }

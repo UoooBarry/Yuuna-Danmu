@@ -145,7 +145,7 @@ func (s *GRPCServer) mapToProto(event live.Event) *pb.LiveEvent {
 		}
 
 	default:
-		log.Printf("Unknown event type: %T", event)
+		log.Printf("Unknown event type: %s", event.Type)
 		return nil
 	}
 }

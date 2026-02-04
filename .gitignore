@@ -17,3 +17,5 @@ yarn-error.log*
 .eslintcache
 
 log/*.log
+
+doc/message_stream.md

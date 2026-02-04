@@ -1,0 +1,9 @@
+func (w *WailsUI) SaveConfig(payload ConfigPayload) {
+	if w.onConfigChange != nil {
+		err := w.onConfigChange(payload)
+		if err != nil {
+			w.AppendError(err)
+		}
+	}
+	w.AppendSysMsg("Save successful")
+}

@@ -1,0 +1,7 @@
+func (w *WailsUI) AppendGiftStarProcess(data *live.GiftStarProcessData) {
+	if w.ctx == nil {
+		return
+	}
+
+	w.emitter(w.ctx, live.GiftStarProcessEvent, data)
+}

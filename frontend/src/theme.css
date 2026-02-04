@@ -1,0 +1,33 @@
+:root[data-theme="rose-pine"] {
+    --base: #191724;
+    --surface: #1f1d2e;
+    --overlay: #26233a;
+    --muted: #6e6a86;
+    --subtle: #908caa;
+    --text: #e0def4;
+    --love: #eb6f92;
+    --gold: #f6c177;
+    --rose: #ebbcba;
+    --pine: #31748f;
+    --foam: #9ccfd8;
+    --iris: #c4a7e7;
+}
+
+:root[data-theme="light"] {
+    --base: #faf4ed;
+    --surface: #fffaf3;
+    --text: #575279;
+    --rose: #d7827e;
+    --pine: #286983;
+    --love: #b4637a;
+    --iris: #907aa9;
+    --muted: #797593;
+}
+
+.app-container { background-color: var(--base); color: var(--text); }
+.nickname { color: var(--rose); }
+
+body {
+    color: var(--text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}

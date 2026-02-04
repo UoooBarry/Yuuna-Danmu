@@ -11,11 +11,12 @@ type UI interface {
 	AppendError(err error)
 	AppendSysMsg(msg string)
 	Start() error
-	Stop() error
+	Stop()
 	SetOnConfigChange(onConfigChange OnConfigChange)
 	AppendSuperChat(superchat *live.SuperChatMsgData)
 	AppendInteraction(interaction *live.InteractMsg)
 	UpdatePopularity(popularity int)
+	AppendGiftStarProcess(data *live.GiftStarProcessData)
 }
 
 type ConfigPayload struct {

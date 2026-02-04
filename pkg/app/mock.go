@@ -22,6 +22,9 @@ func startMockDriver(ctx context.Context, ch chan live.Event) {
 	interactTicker := time.NewTicker(10 * time.Second)
 	defer interactTicker.Stop()
 
+	giftStarProcessTicker := time.NewTicker(15 * time.Second)
+	defer giftStarProcessTicker.Stop()
+
 	mockModel := &live.MedalInfo{
 		MedalName:  "开发者",
 		MedalLevel: 20,
@@ -127,6 +130,21 @@ func startMockDriver(ctx context.Context, ch chan live.Event) {
 						Data: noticeStr,
 					},
 				}
+			}
+		case <-giftStarProcessTicker.C:
+			messages := []string{
+				"用户 花花花花人 的礼物星程已更新",
+				"礼物星程进度更新",
+				"用户 测试用户_" + time.Now().Format("05") + " 完成了礼物星程任务",
+				"星程等级提升",
+			}
+			selectedMessage := messages[rand.Intn(len(messages))]
+			mockGiftStarProcess := &live.GiftStarProcessData{
+				Message: selectedMessage,
+			}
+			ch <- live.Event{
+				Type: live.GiftStarProcessEvent,
+				Data: mockGiftStarProcess,
 			}
 		}
 	}

@@ -181,6 +181,10 @@ func (app *App) handleEvent(event live.Event) {
 		if p, ok := event.Data.(*live.PopularityMsg); ok {
 			app.ui.UpdatePopularity(p.Popularity)
 		}
+	case live.GiftStarProcessEvent:
+		if g, ok := event.Data.(*live.GiftStarProcessData); ok {
+			app.ui.AppendGiftStarProcess(g)
+		}
 	}
 }
 

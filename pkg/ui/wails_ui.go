@@ -33,11 +33,10 @@ func NewWailsUI(assetOts *assetserver.Options, opts ...func(*WailsUI)) *WailsUI 
 	return ui
 }
 
-func (w *WailsUI) Stop() error {
+func (w *WailsUI) Stop() {
 	if w.ctx != nil {
 		runtime.Quit(w.ctx)
 	}
-	return nil
 }
 
 func (w *WailsUI) SetContext(ctx context.Context) {
@@ -154,4 +153,12 @@ func (w *WailsUI) SaveConfig(payload ConfigPayload) {
 
 func (w *WailsUI) LoadConfig() *config.AppConfig {
 	return config.Load()
+}
+
+func (w *WailsUI) AppendGiftStarProcess(data *live.GiftStarProcessData) {
+	if w.ctx == nil {
+		return
+	}
+
+	w.emitter(w.ctx, live.GiftStarProcessEvent, data)
 }

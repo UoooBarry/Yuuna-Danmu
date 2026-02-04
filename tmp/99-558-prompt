@@ -1,0 +1,130 @@
+You have been given a function change.
+Create the contents of the function.
+If the function already contains contents, use those as context
+Check the contents of the file you are in for any helper functions or context
+Your response should be the complete function, including signature
+
+<Example>
+<Input>
+export function fizz_buzz(count: number): void {
+}
+</Input>
+<Output>
+function fizz_buzz(count: number): void {
+  for (let i = 1; i <= count; i++) {
+    if (i % 15 === 0) {
+      console.log("FizzBuzz");
+    } else if (i % 3 === 0) {
+      console.log("Fizz");
+    } else if (i % 5 === 0) {
+      console.log("Buzz");
+    } else {
+      console.log(i);
+    }
+  }
+}
+</Output>
+<Notes>
+* notice that the output did not include the export statement
+* only return the function
+</Notes>
+</Example>
+
+
+if there are DIRECTIONS, follow those when changing this function.  Do not deviate
+
+# BiliLive-Bridge: High-Performance gRPC Broadcast Gateway
+
+A robust, cross-platform desktop application designed to interface with Bilibili Live rooms in real-time. This project bridges Bilibili's message stream with external services via gRPC, allowing developers to build complex live-stream interactions (like AI VTubers, interactive games, or data dashboards) with ease.
+
+## 🚀 Tech Stack
+
+* **Backend:** [Go](https://go.dev/) (High-performance concurrency)
+* **Frontend:** [Svelte](https://svelte.dev/) + [Tailwind CSS](https://tailwindcss.com/) (Reactive UI), also support Terminal version if switch in `main.go`
+* **Bridge Layer:** [Wails v2](https://wails.io/) (Native OS integration)
+* **Communication:** [gRPC](https://grpc.io/) & Protobuf (Type-safe external API)
+* **Style:** Rose-Pine as the base style for GUI.
+
+## ✨ Core Features
+
+* **Real-time Streaming:** Seamlessly capture Danmaku (comments), Gifts, Guard (Captain) subscriptions, and more.
+* **Extensible Architecture:** Out-of-the-box **gRPC** support to push live data to other microservices or local applications.
+* **Developer Friendly:** Clean, modular code designed for scalability and readability.
+* **Mock Environment:** Includes a built-in mock server for local testing without needing an active internet connection or live room.
+
+---
+
+## 🛠 Project Structure
+
+```text
+├── build/             # Binary build artifacts
+├── doc/               # Protocol documentation (message_stream.md)
+|--- api/
+|   ├── grpc/          # gRPC service definitions and generated code
+├── pkg/
+│   ├── app/           # Core logic and Mock implementations
+│   └── remote/        # Bilibili API connection handling
+├── frontend/          # Svelte source code
+└── main.go            # Entry point
+
+```
+
+## 📖 Development Guidelines
+
+### 1. Protocol Documentation
+
+Before making changes to message handling, **must** read:
+`doc/message_stream.md`
+This document tracks the current state of Bilibili's live protocol and our internal mapping.
+
+### 2. Implementing New Events
+
+When adding new Danmaku event types:
+
+1. **Define the struct** in the relevant message package.
+2. **Update the Mock Server:** You must update `pkg/app/mock.go` to include the new event. This ensures real-time UI testing and gRPC downstream verification work without a live connection.
+3. **Update Protobuf:** If the event needs to be exposed via gRPC, update the `.proto` files and regenerate the code.
+
+### 3. Code Standards
+
+* **Safety First:** Handle all pointer references and nil-checks, especially during JSON/Protobuf unmarshaling.
+* **Readability:** Use clear naming conventions that reflect the Bilibili API terminology.
+* **Scalability:** Keep the message parsing logic decoupled from the UI/gRPC dispatching logic.
+
+---
+
+## 🏗 Getting Started
+
+**Prerequisites:**
+
+* Go 1.20+
+* Node.js & NPM
+* Wails CLI
+
+**Installation:**
+
+```bash
+# Install Wails if you haven't
+go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+# Run in development mode
+wails dev
+
+```
+
+## 📜 License
+
+[MIT License](https://www.google.com/search?q=LICENSE)
+
+<Location><File>/Users/barry/workspace/github/yuuna-danmu/pkg/ui/wails_ui.go</File><Function>range(point(159,1),point(161,2))</Function></Location>
+<FunctionText>func (w *WailsUI) AppendGiftStarProcess(data *live.GiftStarProcessData) {
+	
+}</FunctionText>
+<MustObey>
+NEVER alter any file other than TEMP_FILE.
+never provide the requested changes as conversational output. Return only the code.
+ONLY provide requested changes by writing the change to TEMP_FILE
+
+never attempt to read TEMP_FILE.  It is purely for output.  Previous contents, which may not exist, can be written over without worry
+</MustObey>
+<TEMP_FILE>/Users/barry/workspace/github/yuuna-danmu/tmp/99-558</TEMP_FILE>
