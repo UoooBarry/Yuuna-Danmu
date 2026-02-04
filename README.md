@@ -26,6 +26,7 @@ API 参考主要来自 [哔哩哔哩-API-收集整理](https://github.com/Social
 
 1. 安装 [Wails CLI](https://wails.io/docs/gettingstarted/installation)
 2. 准备好 Node.js 和 Go 环境
+3. 如果要使用opencode或者其他工具(我个人在使用opencode和[99](https://github.com/ThePrimeagen/99)插件)，请将[哔哩哔哩-API-收集整理](https://github.com/SocialSisterYi/bilibili-API-collect)中的`live/message_stream.md`文档拷贝到`doc/`目录下, 并且提供`scratch/custom_rules/message_stream/skill.md`给Agent.
 
 #### 运行与打包
 
@@ -49,11 +50,21 @@ API 参考主要来自 [哔哩哔哩-API-收集整理](https://github.com/Social
 - Linux：`~/.config/yuuna-danmu/config.json`
 
 示例内容：
-```json
+```jsonc
 {
-  "room_id": 1,
+  "room_id": 23990839,
+  "refresh_token": "", // 从浏览器B站的Cookies: bili_jct 中复制, 用于自动刷新cookie
   "cookie": "",
-  "debug": false
+  "debug": false,
+  "servers": [
+    {
+      "name": "gRPC",
+      "type": "grpc", // 目前仅支持 gRPC
+      "port": 50051,
+      "enabled": true
+    }
+  ],
+  "transparent": true
 }
 ```
 开发时可将 `debug` 设为 `true` 以开启调试模式。
