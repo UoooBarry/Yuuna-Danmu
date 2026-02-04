@@ -11,7 +11,10 @@
 |   ├── grpc/          # gRPC service definitions and generated code
 ├── pkg/
 │   ├── app/           # Core logic and Mock implementations
-│   └── remote/        # Bilibili API connection handling
+│   ├── bilibili/      # Bilibili authenticated connection handling
+|   ├── live/          # Bilibili Live API connection handling, including data parsers
+|   ├── server/        # Server logic
+|   └── ui/            # UI logic
 ├── frontend/          # Svelte source code
 └── main.go            # Entry point
 
