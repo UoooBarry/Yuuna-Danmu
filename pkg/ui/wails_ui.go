@@ -162,3 +162,11 @@ func (w *WailsUI) AppendGiftStarProcess(data *live.GiftStarProcessData) {
 
 	w.emitter(w.ctx, live.GiftStarProcessEvent, data)
 }
+
+func (w *WailsUI) AppendComboSend(data *live.ComboSendData) {
+	if w.ctx == nil {
+		return
+	}
+
+	w.emitter(w.ctx, live.ComboSendEvent, data)
+}

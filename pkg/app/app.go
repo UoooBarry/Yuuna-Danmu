@@ -189,6 +189,10 @@ func (app *App) handleEvent(event live.Event) {
 		if od, ok := event.Data.(*live.OnlineRankCountData); ok {
 			app.ui.UpdatePopularity(od.OnlineCount)
 		}
+	case live.ComboSendEvent:
+		if cs, ok := event.Data.(*live.ComboSendData); ok {
+			app.ui.AppendComboSend(cs)
+		}
 	}
 }
 

@@ -195,6 +195,46 @@ func (s *GRPCServer) mapToProto(event live.Event) *pb.LiveEvent {
 			},
 		}
 
+	case live.ComboSendEvent:
+		e, ok := event.Data.(*live.ComboSendData)
+		if !ok {
+			return nil
+		}
+
+		return &pb.LiveEvent{
+			Payload: &pb.LiveEvent_ComboSend{
+				ComboSend: &pb.ComboSendData{
+					Action:         e.Action,
+					BatchComboId:   e.BatchComboID,
+					BatchComboNum:  int32(e.BatchComboNum),
+					ComboId:        e.ComboID,
+					ComboNum:       int32(e.ComboNum),
+					ComboTotalCoin: int32(e.ComboTotalCoin),
+					Dmscore:        int32(e.Dmscore),
+					GiftId:         int32(e.GiftID),
+					GiftName:       e.GiftName,
+					GiftNum:        int32(e.GiftNum),
+					IsJoinReceiver: e.IsJoinReceiver,
+					IsNaming:       e.IsNaming,
+					IsShow:         int32(e.IsShow),
+					MedalInfo: &pb.MedalInfo{
+						MedalName:  e.MedalInfo.MedalName,
+						MedalLevel: int32(e.MedalInfo.MedalLevel),
+					},
+					NameColor: e.NameColor,
+					RUname:    e.RUname,
+					ReceiveUserInfo: &pb.UserInfo{
+						Face:  "",
+						Uname: e.ReceiveUserInfo.Uname,
+					},
+					Ruid:     e.Ruid,
+					TotalNum: int32(e.TotalNum),
+					Uid:      e.UID,
+					Uname:    e.Uname,
+				},
+			},
+		}
+
 	default:
 		log.Printf("Unknown event type: %s", event.Type)
 		return nil

@@ -71,6 +71,7 @@ type LiveEvent struct {
 	//	*LiveEvent_OnlineRankCount
 	//	*LiveEvent_Toast
 	//	*LiveEvent_GiftStarProcess
+	//	*LiveEvent_ComboSend
 	Payload       isLiveEvent_Payload `protobuf_oneof:"payload"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -203,6 +204,15 @@ func (x *LiveEvent) GetGiftStarProcess() *GiftStarProcessMsg {
 	return nil
 }
 
+func (x *LiveEvent) GetComboSend() *ComboSendData {
+	if x != nil {
+		if x, ok := x.Payload.(*LiveEvent_ComboSend); ok {
+			return x.ComboSend
+		}
+	}
+	return nil
+}
+
 type isLiveEvent_Payload interface {
 	isLiveEvent_Payload()
 }
@@ -247,6 +257,10 @@ type LiveEvent_GiftStarProcess struct {
 	GiftStarProcess *GiftStarProcessMsg `protobuf:"bytes,10,opt,name=gift_star_process,json=giftStarProcess,proto3,oneof"`
 }
 
+type LiveEvent_ComboSend struct {
+	ComboSend *ComboSendData `protobuf:"bytes,11,opt,name=combo_send,json=comboSend,proto3,oneof"`
+}
+
 func (*LiveEvent_Danmu) isLiveEvent_Payload() {}
 
 func (*LiveEvent_Popularity) isLiveEvent_Payload() {}
@@ -266,6 +280,8 @@ func (*LiveEvent_OnlineRankCount) isLiveEvent_Payload() {}
 func (*LiveEvent_Toast) isLiveEvent_Payload() {}
 
 func (*LiveEvent_GiftStarProcess) isLiveEvent_Payload() {}
+
+func (*LiveEvent_ComboSend) isLiveEvent_Payload() {}
 
 type DanmuMsg struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1279,12 +1295,216 @@ func (x *InteractDataNotice) GetGiftId() int32 {
 	return 0
 }
 
+type ComboSendData struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Action          string                 `protobuf:"bytes,1,opt,name=action,proto3" json:"action,omitempty"`
+	BatchComboId    string                 `protobuf:"bytes,2,opt,name=batch_combo_id,json=batchComboId,proto3" json:"batch_combo_id,omitempty"`
+	BatchComboNum   int32                  `protobuf:"varint,3,opt,name=batch_combo_num,json=batchComboNum,proto3" json:"batch_combo_num,omitempty"`
+	ComboId         string                 `protobuf:"bytes,4,opt,name=combo_id,json=comboId,proto3" json:"combo_id,omitempty"`
+	ComboNum        int32                  `protobuf:"varint,5,opt,name=combo_num,json=comboNum,proto3" json:"combo_num,omitempty"`
+	ComboTotalCoin  int32                  `protobuf:"varint,6,opt,name=combo_total_coin,json=comboTotalCoin,proto3" json:"combo_total_coin,omitempty"`
+	Dmscore         int32                  `protobuf:"varint,7,opt,name=dmscore,proto3" json:"dmscore,omitempty"`
+	GiftId          int32                  `protobuf:"varint,8,opt,name=gift_id,json=giftId,proto3" json:"gift_id,omitempty"`
+	GiftName        string                 `protobuf:"bytes,9,opt,name=gift_name,json=giftName,proto3" json:"gift_name,omitempty"`
+	GiftNum         int32                  `protobuf:"varint,10,opt,name=gift_num,json=giftNum,proto3" json:"gift_num,omitempty"`
+	IsJoinReceiver  bool                   `protobuf:"varint,11,opt,name=is_join_receiver,json=isJoinReceiver,proto3" json:"is_join_receiver,omitempty"`
+	IsNaming        bool                   `protobuf:"varint,12,opt,name=is_naming,json=isNaming,proto3" json:"is_naming,omitempty"`
+	IsShow          int32                  `protobuf:"varint,13,opt,name=is_show,json=isShow,proto3" json:"is_show,omitempty"`
+	MedalInfo       *MedalInfo             `protobuf:"bytes,14,opt,name=medal_info,json=medalInfo,proto3" json:"medal_info,omitempty"`
+	NameColor       string                 `protobuf:"bytes,15,opt,name=name_color,json=nameColor,proto3" json:"name_color,omitempty"`
+	RUname          string                 `protobuf:"bytes,16,opt,name=r_uname,json=rUname,proto3" json:"r_uname,omitempty"`
+	ReceiveUserInfo *UserInfo              `protobuf:"bytes,17,opt,name=receive_user_info,json=receiveUserInfo,proto3" json:"receive_user_info,omitempty"`
+	Ruid            int64                  `protobuf:"varint,18,opt,name=ruid,proto3" json:"ruid,omitempty"`
+	TotalNum        int32                  `protobuf:"varint,19,opt,name=total_num,json=totalNum,proto3" json:"total_num,omitempty"`
+	Uid             int64                  `protobuf:"varint,20,opt,name=uid,proto3" json:"uid,omitempty"`
+	Uname           string                 `protobuf:"bytes,21,opt,name=uname,proto3" json:"uname,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *ComboSendData) Reset() {
+	*x = ComboSendData{}
+	mi := &file_api_grpc_pb_live_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ComboSendData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ComboSendData) ProtoMessage() {}
+
+func (x *ComboSendData) ProtoReflect() protoreflect.Message {
+	mi := &file_api_grpc_pb_live_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ComboSendData.ProtoReflect.Descriptor instead.
+func (*ComboSendData) Descriptor() ([]byte, []int) {
+	return file_api_grpc_pb_live_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ComboSendData) GetAction() string {
+	if x != nil {
+		return x.Action
+	}
+	return ""
+}
+
+func (x *ComboSendData) GetBatchComboId() string {
+	if x != nil {
+		return x.BatchComboId
+	}
+	return ""
+}
+
+func (x *ComboSendData) GetBatchComboNum() int32 {
+	if x != nil {
+		return x.BatchComboNum
+	}
+	return 0
+}
+
+func (x *ComboSendData) GetComboId() string {
+	if x != nil {
+		return x.ComboId
+	}
+	return ""
+}
+
+func (x *ComboSendData) GetComboNum() int32 {
+	if x != nil {
+		return x.ComboNum
+	}
+	return 0
+}
+
+func (x *ComboSendData) GetComboTotalCoin() int32 {
+	if x != nil {
+		return x.ComboTotalCoin
+	}
+	return 0
+}
+
+func (x *ComboSendData) GetDmscore() int32 {
+	if x != nil {
+		return x.Dmscore
+	}
+	return 0
+}
+
+func (x *ComboSendData) GetGiftId() int32 {
+	if x != nil {
+		return x.GiftId
+	}
+	return 0
+}
+
+func (x *ComboSendData) GetGiftName() string {
+	if x != nil {
+		return x.GiftName
+	}
+	return ""
+}
+
+func (x *ComboSendData) GetGiftNum() int32 {
+	if x != nil {
+		return x.GiftNum
+	}
+	return 0
+}
+
+func (x *ComboSendData) GetIsJoinReceiver() bool {
+	if x != nil {
+		return x.IsJoinReceiver
+	}
+	return false
+}
+
+func (x *ComboSendData) GetIsNaming() bool {
+	if x != nil {
+		return x.IsNaming
+	}
+	return false
+}
+
+func (x *ComboSendData) GetIsShow() int32 {
+	if x != nil {
+		return x.IsShow
+	}
+	return 0
+}
+
+func (x *ComboSendData) GetMedalInfo() *MedalInfo {
+	if x != nil {
+		return x.MedalInfo
+	}
+	return nil
+}
+
+func (x *ComboSendData) GetNameColor() string {
+	if x != nil {
+		return x.NameColor
+	}
+	return ""
+}
+
+func (x *ComboSendData) GetRUname() string {
+	if x != nil {
+		return x.RUname
+	}
+	return ""
+}
+
+func (x *ComboSendData) GetReceiveUserInfo() *UserInfo {
+	if x != nil {
+		return x.ReceiveUserInfo
+	}
+	return nil
+}
+
+func (x *ComboSendData) GetRuid() int64 {
+	if x != nil {
+		return x.Ruid
+	}
+	return 0
+}
+
+func (x *ComboSendData) GetTotalNum() int32 {
+	if x != nil {
+		return x.TotalNum
+	}
+	return 0
+}
+
+func (x *ComboSendData) GetUid() int64 {
+	if x != nil {
+		return x.Uid
+	}
+	return 0
+}
+
+func (x *ComboSendData) GetUname() string {
+	if x != nil {
+		return x.Uname
+	}
+	return ""
+}
+
 var File_api_grpc_pb_live_proto protoreflect.FileDescriptor
 
 const file_api_grpc_pb_live_proto_rawDesc = "" +
 	"\n" +
 	"\x16api/grpc/pb/live.proto\x12\x04live\"\a\n" +
-	"\x05Empty\"\xf2\x03\n" +
+	"\x05Empty\"\xa8\x04\n" +
 	"\tLiveEvent\x12&\n" +
 	"\x05danmu\x18\x01 \x01(\v2\x0e.live.DanmuMsgH\x00R\x05danmu\x125\n" +
 	"\n" +
@@ -1299,7 +1519,9 @@ const file_api_grpc_pb_live_proto_rawDesc = "" +
 	"\x11online_rank_count\x18\b \x01(\v2\x18.live.OnlineRankCountMsgH\x00R\x0fonlineRankCount\x12&\n" +
 	"\x05toast\x18\t \x01(\v2\x0e.live.ToastMsgH\x00R\x05toast\x12F\n" +
 	"\x11gift_star_process\x18\n" +
-	" \x01(\v2\x18.live.GiftStarProcessMsgH\x00R\x0fgiftStarProcessB\t\n" +
+	" \x01(\v2\x18.live.GiftStarProcessMsgH\x00R\x0fgiftStarProcess\x124\n" +
+	"\n" +
+	"combo_send\x18\v \x01(\v2\x13.live.ComboSendDataH\x00R\tcomboSendB\t\n" +
 	"\apayload\"\x99\x01\n" +
 	"\bDanmuMsg\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\tR\acontent\x12\x17\n" +
@@ -1390,7 +1612,32 @@ const file_api_grpc_pb_live_proto_rawDesc = "" +
 	"\x03cnt\x18\x01 \x01(\x05R\x03cnt\x12\x1f\n" +
 	"\vsuffix_text\x18\x02 \x01(\tR\n" +
 	"suffixText\x12\x17\n" +
-	"\agift_id\x18\x03 \x01(\x05R\x06giftId2:\n" +
+	"\agift_id\x18\x03 \x01(\x05R\x06giftId\"\x9f\x05\n" +
+	"\rComboSendData\x12\x16\n" +
+	"\x06action\x18\x01 \x01(\tR\x06action\x12$\n" +
+	"\x0ebatch_combo_id\x18\x02 \x01(\tR\fbatchComboId\x12&\n" +
+	"\x0fbatch_combo_num\x18\x03 \x01(\x05R\rbatchComboNum\x12\x19\n" +
+	"\bcombo_id\x18\x04 \x01(\tR\acomboId\x12\x1b\n" +
+	"\tcombo_num\x18\x05 \x01(\x05R\bcomboNum\x12(\n" +
+	"\x10combo_total_coin\x18\x06 \x01(\x05R\x0ecomboTotalCoin\x12\x18\n" +
+	"\admscore\x18\a \x01(\x05R\admscore\x12\x17\n" +
+	"\agift_id\x18\b \x01(\x05R\x06giftId\x12\x1b\n" +
+	"\tgift_name\x18\t \x01(\tR\bgiftName\x12\x19\n" +
+	"\bgift_num\x18\n" +
+	" \x01(\x05R\agiftNum\x12(\n" +
+	"\x10is_join_receiver\x18\v \x01(\bR\x0eisJoinReceiver\x12\x1b\n" +
+	"\tis_naming\x18\f \x01(\bR\bisNaming\x12\x17\n" +
+	"\ais_show\x18\r \x01(\x05R\x06isShow\x12.\n" +
+	"\n" +
+	"medal_info\x18\x0e \x01(\v2\x0f.live.MedalInfoR\tmedalInfo\x12\x1d\n" +
+	"\n" +
+	"name_color\x18\x0f \x01(\tR\tnameColor\x12\x17\n" +
+	"\ar_uname\x18\x10 \x01(\tR\x06rUname\x12:\n" +
+	"\x11receive_user_info\x18\x11 \x01(\v2\x0e.live.UserInfoR\x0freceiveUserInfo\x12\x12\n" +
+	"\x04ruid\x18\x12 \x01(\x03R\x04ruid\x12\x1b\n" +
+	"\ttotal_num\x18\x13 \x01(\x05R\btotalNum\x12\x10\n" +
+	"\x03uid\x18\x14 \x01(\x03R\x03uid\x12\x14\n" +
+	"\x05uname\x18\x15 \x01(\tR\x05uname2:\n" +
 	"\vLiveService\x12+\n" +
 	"\tSubscribe\x12\v.live.Empty\x1a\x0f.live.LiveEvent0\x01B#Z!uooobarry/yuuna-danmu/api/grpc/pbb\x06proto3"
 
@@ -1406,7 +1653,7 @@ func file_api_grpc_pb_live_proto_rawDescGZIP() []byte {
 	return file_api_grpc_pb_live_proto_rawDescData
 }
 
-var file_api_grpc_pb_live_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_api_grpc_pb_live_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_api_grpc_pb_live_proto_goTypes = []any{
 	(*Empty)(nil),              // 0: live.Empty
 	(*LiveEvent)(nil),          // 1: live.LiveEvent
@@ -1425,6 +1672,7 @@ var file_api_grpc_pb_live_proto_goTypes = []any{
 	(*InteractData102)(nil),    // 14: live.InteractData102
 	(*InteractCombo)(nil),      // 15: live.InteractCombo
 	(*InteractDataNotice)(nil), // 16: live.InteractDataNotice
+	(*ComboSendData)(nil),      // 17: live.ComboSendData
 }
 var file_api_grpc_pb_live_proto_depIdxs = []int32{
 	2,  // 0: live.LiveEvent.danmu:type_name -> live.DanmuMsg
@@ -1435,19 +1683,22 @@ var file_api_grpc_pb_live_proto_depIdxs = []int32{
 	11, // 5: live.LiveEvent.online_rank_count:type_name -> live.OnlineRankCountMsg
 	12, // 6: live.LiveEvent.toast:type_name -> live.ToastMsg
 	13, // 7: live.LiveEvent.gift_star_process:type_name -> live.GiftStarProcessMsg
-	5,  // 8: live.GiftData.gift_info:type_name -> live.GiftInfo
-	6,  // 9: live.GiftData.medal_info:type_name -> live.MedalInfo
-	7,  // 10: live.GiftData.combo_send:type_name -> live.ComboSend
-	6,  // 11: live.SuperChatMsg.medal_info:type_name -> live.MedalInfo
-	8,  // 12: live.SuperChatMsg.user_info:type_name -> live.UserInfo
-	15, // 13: live.InteractData102.combo:type_name -> live.InteractCombo
-	0,  // 14: live.LiveService.Subscribe:input_type -> live.Empty
-	1,  // 15: live.LiveService.Subscribe:output_type -> live.LiveEvent
-	15, // [15:16] is the sub-list for method output_type
-	14, // [14:15] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	17, // 8: live.LiveEvent.combo_send:type_name -> live.ComboSendData
+	5,  // 9: live.GiftData.gift_info:type_name -> live.GiftInfo
+	6,  // 10: live.GiftData.medal_info:type_name -> live.MedalInfo
+	7,  // 11: live.GiftData.combo_send:type_name -> live.ComboSend
+	6,  // 12: live.SuperChatMsg.medal_info:type_name -> live.MedalInfo
+	8,  // 13: live.SuperChatMsg.user_info:type_name -> live.UserInfo
+	15, // 14: live.InteractData102.combo:type_name -> live.InteractCombo
+	6,  // 15: live.ComboSendData.medal_info:type_name -> live.MedalInfo
+	8,  // 16: live.ComboSendData.receive_user_info:type_name -> live.UserInfo
+	0,  // 17: live.LiveService.Subscribe:input_type -> live.Empty
+	1,  // 18: live.LiveService.Subscribe:output_type -> live.LiveEvent
+	18, // [18:19] is the sub-list for method output_type
+	17, // [17:18] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_api_grpc_pb_live_proto_init() }
@@ -1466,6 +1717,7 @@ func file_api_grpc_pb_live_proto_init() {
 		(*LiveEvent_OnlineRankCount)(nil),
 		(*LiveEvent_Toast)(nil),
 		(*LiveEvent_GiftStarProcess)(nil),
+		(*LiveEvent_ComboSend)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1473,7 +1725,7 @@ func file_api_grpc_pb_live_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_grpc_pb_live_proto_rawDesc), len(file_api_grpc_pb_live_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   17,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

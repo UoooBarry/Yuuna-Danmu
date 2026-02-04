@@ -42,8 +42,17 @@ func (c *WsClient) dispatch(body []byte) {
 		}
 	case GiftEvent:
 		data := parseGift(body)
+		log.Println(data)
 		c.eventCh <- Event{
 			Type:      GiftEvent,
+			Data:      data,
+			Timestamp: time.Now().UnixNano(),
+		}
+	case ComboSendEvent:
+		data := parseComboSend(body)
+		log.Println(data)
+		c.eventCh <- Event{
+			Type:      ComboSendEvent,
 			Data:      data,
 			Timestamp: time.Now().UnixNano(),
 		}
@@ -154,6 +163,10 @@ func parseSuperChat(body []byte) *SuperChatMsgData {
 
 func parseGiftStarProcess(body []byte) *GiftStarProcessData {
 	return parseJSONData[GiftStarProcessData](body)
+}
+
+func parseComboSend(body []byte) *ComboSendData {
+	return parseJSONData[ComboSendData](body)
 }
 
 func parseOnlineRankCount(body []byte) *OnlineRankCountData {

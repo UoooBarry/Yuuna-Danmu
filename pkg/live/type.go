@@ -81,6 +81,7 @@ var (
 	DanmuEvent           = "DANMU_MSG"
 	PopularityEvent      = "POPULARITY"
 	GiftEvent            = "SEND_GIFT"
+	ComboSendEvent       = "COMBO_SEND"
 	SysMsgEvent          = "SYS_MSG"
 	ErrorEvent           = "SYS_ERROR"
 	SuperChatEvent       = "SUPER_CHAT_MESSAGE"
@@ -142,4 +143,32 @@ type OnlineRankCountData struct {
 	CountText       string `json:"count_text"`
 	OnlineCount     int    `json:"online_count"`
 	OnlineCountText string `json:"online_count_text"`
+}
+
+type ComboSendData struct {
+	Action          string    `json:"action"`
+	BatchComboID    string    `json:"batch_combo_id"`
+	BatchComboNum   int       `json:"batch_combo_num"`
+	ComboID         string    `json:"combo_id"`
+	ComboNum        int       `json:"combo_num"`
+	ComboTotalCoin  int       `json:"combo_total_coin"`
+	Dmscore         int       `json:"dmscore"`
+	GiftID          int       `json:"gift_id"`
+	GiftName        string    `json:"gift_name"`
+	GiftNum         int       `json:"gift_num"`
+	IsJoinReceiver  bool      `json:"is_join_receiver"`
+	IsNaming        bool      `json:"is_naming"`
+	IsShow          int       `json:"is_show"`
+	MedalInfo       MedalInfo `json:"medal_info"`
+	NameColor       string    `json:"name_color"`
+	RUname          string    `json:"r_uname"`
+	ReceiveUserInfo struct {
+		UID   int64  `json:"uid"`
+		Uname string `json:"uname"`
+	} `json:"receive_user_info"`
+	Ruid       int64  `json:"ruid"`
+	SendMaster any    `json:"send_master"`
+	TotalNum   int    `json:"total_num"`
+	UID        int64  `json:"uid"`
+	Uname      string `json:"uname"`
 }

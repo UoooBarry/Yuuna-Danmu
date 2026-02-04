@@ -16,6 +16,9 @@ func startMockDriver(ctx context.Context, ch chan live.Event) {
 	giftTicker := time.NewTicker(5 * time.Second)
 	defer giftTicker.Stop()
 
+	comboSendTicker := time.NewTicker(8 * time.Second)
+	defer comboSendTicker.Stop()
+
 	superChatTicker := time.NewTicker(30 * time.Second)
 	defer superChatTicker.Stop()
 
@@ -71,6 +74,41 @@ func startMockDriver(ctx context.Context, ch chan live.Event) {
 			ch <- live.Event{
 				Type: live.GiftEvent,
 				Data: mockGift,
+			}
+		case <-comboSendTicker.C:
+			mockComboSend := &live.ComboSendData{
+				Action:         "投喂",
+				BatchComboID:   "batch:gift:combo_id:510149209:36047134:31036:1673622464.8445",
+				BatchComboNum:  3,
+				ComboID:        "gift:combo_id:510149209:36047134:31036:1673622464.8434",
+				ComboNum:       3,
+				ComboTotalCoin: 300,
+				Dmscore:        112,
+				GiftID:         31036,
+				GiftName:       "小花花",
+				GiftNum:        0,
+				IsJoinReceiver: false,
+				IsNaming:       false,
+				IsShow:         1,
+				MedalInfo:      *mockModel,
+				NameColor:      "",
+				RUname:         "测试主播",
+				ReceiveUserInfo: struct {
+					UID   int64  `json:"uid"`
+					Uname string `json:"uname"`
+				}{
+					UID:   36047134,
+					Uname: "测试主播",
+				},
+				Ruid:       36047134,
+				SendMaster: nil,
+				TotalNum:   3,
+				UID:        510149209,
+				Uname:      "花花花花人",
+			}
+			ch <- live.Event{
+				Type: live.ComboSendEvent,
+				Data: mockComboSend,
 			}
 		case <-superChatTicker.C:
 			mockSuperChat := &live.SuperChatMsgData{

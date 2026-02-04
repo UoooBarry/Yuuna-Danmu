@@ -8,6 +8,7 @@ import (
 type UI interface {
 	AppendDanmu(medalName string, medalLevel int, nickname, content string)
 	AppendGift(gift *live.GiftData)
+	AppendComboSend(data *live.ComboSendData)
 	AppendError(err error)
 	AppendSysMsg(msg string)
 	Start() error

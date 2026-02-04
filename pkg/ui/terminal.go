@@ -70,6 +70,22 @@ func (t *TerminalUI) AppendGift(gift *live.GiftData) {
 	fmt.Println(">>> JSON_EVENT:", string(jsonBytes))
 }
 
+func (t *TerminalUI) AppendComboSend(data *live.ComboSendData) {
+	fmt.Printf("[%s] [连击礼物] [%s] 送出 %s x %d (连击: %d)\n", time.Now().Format(time.TimeOnly), data.Uname, data.GiftName, data.TotalNum, data.ComboNum)
+
+	comboSendEvent := map[string]interface{}{
+		"event":     "ComboSendEvent",
+		"comboData": data,
+		"timestamp": time.Now().Format(time.RFC3339),
+	}
+	jsonBytes, err := json.Marshal(comboSendEvent)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error marshalling ComboSendEvent: %v\n", err)
+		return
+	}
+	fmt.Println(">>> JSON_EVENT:", string(jsonBytes))
+}
+
 func (t *TerminalUI) AppendError(err error) {
 	fmt.Printf("[%s] [错误] %v\n", time.Now().Format(time.TimeOnly), err)
 

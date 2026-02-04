@@ -22,8 +22,7 @@
   let showSettings = false;
   let roomID = 50819;
   let cookie = "";
-  let servers: ServerSettings[] = [];
-  let popularity = 0;
+  let servers: ServerSettings[] = []; let popularity = 0;
   let refreshToken = "";
   let transparent = false;
 
@@ -61,37 +60,25 @@
 
     EventsOn("SEND_GIFT", (data: any) => {
       const currentComboId = data.combo_send?.combo_id;
+      const price = data.price || 100; // 默认100金瓜子
+      
+      console.log(data)
+      // 创建礼物弹幕
+      const newGift: GiftMsg = {
+        ...data,
+        type: "gift",
+        combo_id: currentComboId,
+        gift_num: data.combo_send?.combo_num || 0,
+        combo_total_coin: data.combo_total_coin,
+        total_coin: data.total_coin,
+        price: price,
+      };
 
-      const existingIndex = danmuList.findIndex(
-        (item) => item.type === "gift" && item.combo_id === currentComboId,
-      );
-
-      let updatedGift: GiftMsg;
-
-      if (currentComboId && existingIndex !== -1) {
-        const oldGift = danmuList[existingIndex] as GiftMsg;
-
-        updatedGift = {
-          ...data,
-          type: "gift",
-          combo_id: currentComboId,
-          gift_num:
-            data.combo_send?.combo_num || data.gift_num || oldGift.gift_num,
-        };
-
-        danmuList.splice(existingIndex, 1);
-      } else {
-        updatedGift = {
-          ...data,
-          type: "gift",
-          combo_id: currentComboId,
-          gift_num: data.combo_send?.combo_num || data.gift_num || 1,
-        };
+      if (newGift.gift_num > 0) {
+        danmuList = [...danmuList, newGift];
+        if (danmuList.length > 100) danmuList = danmuList.slice(danmuList.length - 100);
+        scrollToBottom();
       }
-
-      danmuList = [...danmuList, updatedGift];
-      if (danmuList.length > 100) danmuList = danmuList.slice(1);
-      scrollToBottom();
     });
 
     EventsOn("SUPER_CHAT_MESSAGE", (data: SuperChatMsg) => {
@@ -108,6 +95,77 @@
       console.log(msg);
       danmuList = [...danmuList, msg];
       if (danmuList.length > 100) danmuList = danmuList.slice(1);
+      scrollToBottom();
+    });
+
+    EventsOn("COMBO_SEND", (data: any) => {
+      const currentComboId = data.combo_id;
+      console.log("COMBO_SEND event:", data);
+      
+      if (currentComboId) {
+        const existingIndex = danmuList.findIndex(
+          (item) => item.type === "gift" && item.combo_id === currentComboId,
+        );
+
+        if (existingIndex !== -1) {
+          // 找到已有的礼物，用COMBO_SEND的正确数量更新
+          const oldGift = danmuList[existingIndex] as GiftMsg;
+          
+          // 优先使用COMBO_SEND提供的数量
+          const totalNum = data.total_num || data.combo_num || data.batch_combo_num || oldGift.gift_num;
+          
+          const updatedGift: GiftMsg = {
+            ...oldGift,
+            ...data,
+            type: "gift",
+            combo_id: currentComboId,
+            batch_combo_id: data.batch_combo_id,
+            gift_num: totalNum,
+            total_num: totalNum,
+            combo_num: data.combo_num,
+            batch_combo_num: data.batch_combo_num,
+            combo_total_coin: data.combo_total_coin || oldGift.combo_total_coin,
+            // 确保必要字段存在
+            uname: data.uname || oldGift.uname,
+            gift_name: data.gift_name || oldGift.gift_name,
+            action: data.action || oldGift.action,
+            medalName: data.medal_info?.medal_name || oldGift.medalName,
+            medalLevel: data.medal_info?.medal_level || oldGift.medalLevel,
+          };
+
+          // 更新数据并移动到最新位置
+          danmuList = [
+            ...danmuList.slice(0, existingIndex),
+            ...danmuList.slice(existingIndex + 1),
+            updatedGift
+          ];
+        } else {
+          // 没有找到已有的combo，创建新的礼物弹幕
+          const totalNum = data.total_num || data.combo_num || data.batch_combo_num || 1;
+          
+          const newGift: GiftMsg = {
+            ...data,
+            type: "gift",
+            combo_id: currentComboId,
+            batch_combo_id: data.batch_combo_id,
+            gift_num: totalNum,
+            total_num: totalNum,
+            combo_num: data.combo_num,
+            batch_combo_num: data.batch_combo_num,
+            combo_total_coin: data.combo_total_coin,
+            // 确保必要字段存在
+            uname: data.uname,
+            gift_name: data.gift_name,
+            action: data.action,
+            medalName: data.medal_info?.medal_name,
+            medalLevel: data.medal_info?.medal_level,
+        };
+
+          danmuList = [...danmuList, newGift];
+        }
+      }
+      
+      if (danmuList.length > 100) danmuList = danmuList.slice(danmuList.length - 100);
       scrollToBottom();
     });
 
@@ -192,9 +250,18 @@
   <header class="drag-bar">
     <div class="header-left">
       <span class="title">Yuuna Danmu</span>
-      {#if popularity > 0}
-        <span class="popularity">🔥 {popularity}</span>
-      {/if}
+      <div class="header-info">
+        <div class="info-badge room-badge">
+          <span class="info-icon">📺</span>
+          <span class="info-value">{roomID}</span>
+        </div>
+        {#if popularity > 0}
+          <div class="info-badge popularity-badge">
+            <span class="info-icon">🔥</span>
+            <span class="info-value">{popularity.toLocaleString()}</span>
+          </div>
+        {/if}
+      </div>
     </div>
 
     <div class="controls" class:visible={showControls}>
@@ -349,7 +416,7 @@
 
                 <div class="gift-details">
                   <span class="gift-name">{d.gift_name}</span>
-                  <span class="gift-count">x {d.combo_send?.combo_num}</span>
+                  <span class="gift-count">x {d.gift_num}</span>
                 </div>
 
                 {#if d.coin_type === "gold" && d.combo_total_coin}
@@ -513,13 +580,66 @@
   .header-left {
     display: flex;
     align-items: center;
+    gap: 12px;
+    align-items: center;
     gap: 8px;
   }
 
-  .popularity {
-    font-size: 10px;
-    color: var(--love);
+  .header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: 16px;
+  }
+
+  .info-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+  }
+
+  .room-badge {
+    background: linear-gradient(
+      135deg,
+      rgba(49, 116, 143, 0.15),
+      rgba(156, 207, 216, 0.1)
+    );
+    color: var(--foam);
+    border: 1px solid rgba(49, 116, 143, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .popularity-badge {
+    background: linear-gradient(
+      135deg,
+      rgba(246, 193, 119, 0.15),
+      rgba(235, 111, 146, 0.1)
+    );
+    color: var(--gold);
+    border: 1px solid rgba(246, 193, 119, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .info-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+
+  .info-value {
+    font-variant-numeric: tabular-nums;
     font-weight: 600;
+  }
+
+  .info-icon {
+    font-size: 10px;
+    opacity: 0.8;
   }
 
   .controls {
@@ -563,9 +683,11 @@
 
   .title {
     font-size: 10px;
+    pointer-events: none;
     font-weight: bold;
     color: var(--muted);
-    pointer-events: none;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
   }
 
   .settings-panel {
